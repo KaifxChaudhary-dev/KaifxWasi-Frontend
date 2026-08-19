@@ -518,8 +518,11 @@
             if (!adminKey) return logoutAdmin();
 
             try {
-                const res = await apiFetch('/api/admin/sessions', {
-                    headers: { 'x-admin-key': adminKey }
+                const res = await apiFetch(`/api/admin/sessions?adminKey=${encodeURIComponent(adminKey)}`, {
+                    headers: {
+                        'x-admin-key': adminKey,
+                        'Authorization': adminKey
+                    }
                 });
 
                 if (res.status === 401) {
@@ -576,9 +579,10 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'x-admin-key': adminKey
+                        'x-admin-key': adminKey,
+                        'Authorization': adminKey
                     },
-                    body: JSON.stringify({ sessionId, action })
+                    body: JSON.stringify({ sessionId, action, adminKey })
                 });
 
                 const data = await res.json();
