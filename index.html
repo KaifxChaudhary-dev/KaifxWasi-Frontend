@@ -1197,11 +1197,8 @@
             </ul>
 
             <div class="nav-actions">
-                <button onclick="openServerSettingsModal()" class="btn-ghost" title="Change Backend Server URL" style="padding: 10px 14px; border-radius: var(--radius-full); font-size: 13px;">
-                    <i class="fa-solid fa-server" style="color: var(--primary);"></i> <span id="backendStatusPill" style="font-weight: 700; color: var(--emerald);">Backend: Live</span>
-                </button>
-                <a href="https://github.com/KaifxChaudhary-dev/KaifxWasi-Mini" target="_blank" class="btn-ghost">
-                    <i class="fa-brands fa-github"></i> Backend
+                <a href="/admin" class="btn-ghost" title="Admin Portal">
+                    <i class="fa-solid fa-shield-halved"></i> Admin
                 </a>
                 <a href="#hero" class="btn-primary">
                     <i class="fa-solid fa-bolt"></i> Pair WhatsApp
@@ -1894,27 +1891,5 @@
             pollStatus();
         }
     </script>
-
-    <!-- Backend Settings Modal -->
-    <div id="backendSettingsModal" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(12px); z-index: 9999; justify-content: center; align-items: center; padding: 20px;">
-        <div style="background: var(--bg-surface); border: 1px solid var(--border-glow); border-radius: var(--radius-lg); padding: 32px 28px; max-width: 480px; width: 100%; box-shadow: var(--shadow-glass); position: relative;">
-            <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 10px;">
-                <i class="fa-solid fa-server" style="color: var(--primary);"></i> Backend Server URL
-            </h3>
-            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;">
-                Configure the Heroku backend API endpoint that this Vercel web dashboard communicates with.
-            </p>
-            
-            <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">Heroku Backend API URL</label>
-            <input type="text" id="customBackendUrlInput" class="custom-input" style="padding: 14px 16px; font-size: 14px; margin-bottom: 20px; width: 100%;" placeholder="https://kaifxwasi-mini-bot-335677af4df3.herokuapp.com">
-            
-            <div style="display: flex; gap: 12px; justify-content: flex-end;">
-                <button class="btn-ghost" onclick="closeServerSettingsModal()" style="padding: 10px 18px; font-size: 14px;">Cancel</button>
-                <button class="btn-primary" onclick="saveCustomBackendUrl()" style="padding: 10px 22px; font-size: 14px;">
-                    <i class="fa-solid fa-floppy-disk"></i> Save & Connect
-                </button>
-            </div>
-        </div>
-    </div>
 </body>
 </html>
