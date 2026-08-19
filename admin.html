@@ -364,7 +364,7 @@
                         <h4 style="font-size: 14px; font-weight: 700; color: white;">Heroku Backend API URL</h4>
                         <span id="adminBackendPingBadge" style="font-size: 11px; padding: 2px 8px; border-radius: 99px; background: rgba(16, 185, 129, 0.15); color: #10b981; font-weight: 700;">🟢 Live</span>
                     </div>
-                    <input type="text" id="adminBackendUrlInput" style="width: 100%; max-width: 480px; margin-top: 6px; padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--border-glass); border-radius: 8px; color: #f8fafc; font-size: 13px; font-family: monospace;" placeholder="https://kaifxwasi-mini-bot-335677af4df3.herokuapp.com">
+                    <input type="text" id="adminBackendUrlInput" style="width: 100%; max-width: 480px; margin-top: 6px; padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--border-glass); border-radius: 8px; color: #f8fafc; font-size: 13px; font-family: monospace;" placeholder="https://kaifxwasi-backend-7a3a88dd4d0b.herokuapp.com">
                 </div>
             </div>
             <div>
@@ -445,7 +445,7 @@
     </div>
 
     <script>
-        const HEROKU_BACKEND = 'https://kaifxwasi-mini-bot-335677af4df3.herokuapp.com';
+        const HEROKU_BACKEND = 'https://kaifxwasi-backend-7a3a88dd4d0b.herokuapp.com';
         const API_BASE = (window.location.hostname.includes('vercel.app') || (window.location.hostname === 'localhost' && window.location.port !== '3000'))
             ? (localStorage.getItem('kaif_backend_url') || HEROKU_BACKEND)
             : '';
