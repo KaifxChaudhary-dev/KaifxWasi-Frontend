@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KaifxWasi-Mini Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --bg-card: #131b2e;
+            --bg-hover: #1c2744;
+            --accent-primary: #3b82f6;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --text-main: #f8fafc;
+            --text-secondary: #94a3b8;
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-glow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .admin-container {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--bg-card);
+            border-radius: 28px;
+            border: 1px solid var(--card-border);
+            padding: 32px;
+            box-shadow: var(--card-glow);
+        }
+
+        /* Login Screen */
+        .login-box {
+            max-width: 440px;
+            margin: 80px auto;
+            text-align: center;
+            background: var(--bg-card);
+            border-radius: 28px;
+            border: 1px solid var(--card-border);
+            padding: 40px;
+            box-shadow: var(--card-glow);
+        }
+
+        .login-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #ef4444, #f59e0b);
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            color: white;
+            margin: 0 auto 18px auto;
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 16px;
+            border-radius: 14px;
+            border: 1px solid var(--card-border);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 16px;
+            margin: 16px 0;
+            outline: none;
+            text-align: center;
+        }
+
+        .login-input:focus {
+            border-color: var(--accent-primary);
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--card-border);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .brand-icon {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, #ef4444, #3b82f6);
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: white;
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .brand-title h1 {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .brand-title p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-card h4 {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .stat-card p {
+            font-size: 22px;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+
+        .stat-card i {
+            font-size: 24px;
+            color: var(--accent-primary);
+            opacity: 0.8;
+        }
+
+        /* Table */
+        .table-container {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 16px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        td {
+            padding: 16px 20px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .status-pill.online {
+            background: rgba(16, 185, 129, 0.12);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+
+        .status-pill.waiting {
+            background: rgba(245, 158, 11, 0.12);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.25);
+        }
+
+        .status-pill.offline {
+            background: rgba(239, 68, 68, 0.12);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--card-border);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: #121827;
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 440px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Login View -->
+    <div id="loginScreen" class="login-box">
+        <div class="login-icon"><i class="fa-solid fa-lock"></i></div>
+        <h2 style="font-size: 22px; margin-bottom: 6px;">Admin Authorization</h2>
+        <p style="font-size: 13px; color: var(--text-secondary);">Enter master admin password to access session controls.</p>
+        <input type="password" id="adminPasswordInput" class="login-input" placeholder="Admin Password" onkeypress="if(event.key==='Enter') loginAdmin()" />
+        <button class="btn btn-primary" style="width: 100%; padding: 14px; justify-content: center;" onclick="loginAdmin()">
+            <i class="fa-solid fa-right-to-bracket"></i> Login to Admin Panel
+        </button>
+    </div>
+
+    <!-- Admin Control Panel View -->
+    <div id="adminPanel" class="admin-container" style="display: none;">
+        <!-- Header -->
+        <div class="header">
+            <div class="brand-section">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <div class="brand-title">
+                    <h1>KaifxWasi-Mini Admin Panel</h1>
+                    <p>Multi-Tenant Session Management & Controls</p>
+                </div>
+            </div>
+            <div>
+                <button class="btn btn-danger" onclick="logoutAdmin()">
+                    <i class="fa-solid fa-power-off"></i> Exit Admin
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div>
+                    <h4>Active User Bots</h4>
+                    <p id="statActiveCount">0 / 50</p>
+                </div>
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <div class="stat-card">
+                <div>
+                    <h4>Registered Sessions</h4>
+                    <p id="statTotalReg">0</p>
+                </div>
+                <i class="fa-solid fa-database"></i>
+            </div>
+            <div class="stat-card">
+                <div>
+                    <h4>Max Deployment Limit</h4>
+                    <p>50 Users</p>
+                </div>
+                <i class="fa-solid fa-server"></i>
+            </div>
+        </div>
+
+        <!-- Section Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-size: 18px; font-weight: 700;"><i class="fa-solid fa-list-check" style="color: var(--accent-primary);"></i> All User Sessions</h3>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn" onclick="fetchAdminSessions()">
+                    <i class="fa-solid fa-rotate"></i> Refresh
+                </button>
+                <button class="btn btn-primary" onclick="openCreateModal()">
+                    <i class="fa-solid fa-plus"></i> + Create Session
+                </button>
+            </div>
+        </div>
+
+        <!-- Sessions Table -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Session ID</th>
+                        <th>WhatsApp Phone</th>
+                        <th>Status</th>
+                        <th>Pairing Code</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="sessionsTableBody">
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 30px;">
+                            Loading active user sessions...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Session Detail Modal (QR / Code) -->
+    <div id="sessionModal" class="modal-overlay">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <h3 id="modalSessionTitle" style="font-size: 20px; margin-bottom: 12px;">Session Details</h3>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const HEROKU_BACKEND = 'https://kaifxwasi-mini-bot-335677af4df3.herokuapp.com';
+        const API_BASE = (window.location.hostname.includes('vercel.app') || (window.location.hostname === 'localhost' && window.location.port !== '3000'))
+            ? (localStorage.getItem('kaif_backend_url') || HEROKU_BACKEND)
+            : '';
+
+        function apiFetch(endpoint, options = {}) {
+            const url = endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint}`;
+            return fetch(url, options);
+        }
+
+        let adminKey = localStorage.getItem('admin_key') || '';
+
+        async function loginAdmin() {
+            const pwd = document.getElementById('adminPasswordInput').value;
+            if (!pwd) return alert('Please enter admin password.');
+
+            try {
+                const res = await apiFetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: pwd })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    adminKey = data.token;
+                    localStorage.setItem('admin_key', adminKey);
+                    showAdminPanel();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (e) {
+                alert('Login failed. Check server status.');
+            }
+        }
+
+        function logoutAdmin() {
+            localStorage.removeItem('admin_key');
+            adminKey = '';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'block';
+        }
+
+        function showAdminPanel() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            fetchAdminSessions();
+        }
+
+        async function fetchAdminSessions() {
+            if (!adminKey) return logoutAdmin();
+
+            try {
+                const res = await apiFetch('/api/admin/sessions', {
+                    headers: { 'x-admin-key': adminKey }
+                });
+
+                if (res.status === 401) {
+                    alert('Admin session expired or invalid password.');
+                    return logoutAdmin();
+                }
+
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('statActiveCount').innerText = `${data.activeCount} / ${data.maxSessions}`;
+                    document.getElementById('statTotalReg').innerText = data.totalRegistered;
+
+                    const tbody = document.getElementById('sessionsTableBody');
+                    if (!data.sessions || data.sessions.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 30px;">No user sessions registered yet. Click "+ Create Session" to add one.</td></tr>';
+                        return;
+                    }
+
+                    let html = '';
+                    data.sessions.forEach(s => {
+                        const statusClass = s.connected ? 'online' : (s.isConnecting ? 'waiting' : 'offline');
+                        const statusLabel = s.connected ? '🟢 Online' : (s.isConnecting ? '🟡 Connecting' : '🔴 Offline');
+                        const phone = s.phone ? ('+' + s.phone) : 'N/A';
+                        const code = s.pairingCode || 'N/A';
+
+                        html += `
+                            <tr>
+                                <td><strong style="font-family: monospace; color: white;">${s.sessionId}</strong></td>
+                                <td>${phone}</td>
+                                <td><span class="status-pill ${statusClass}">${statusLabel}</span></td>
+                                <td><span style="font-family: monospace; color: #10b981;">${code}</span></td>
+                                <td>
+                                    <div style="display: flex; gap: 6px;">
+                                        <button class="btn" onclick="viewSessionQR('${s.sessionId}')"><i class="fa-solid fa-qrcode"></i> QR/Code</button>
+                                        <button class="btn" onclick="adminSessionAction('${s.sessionId}', 'restart')"><i class="fa-solid fa-rotate"></i></button>
+                                        <button class="btn btn-danger" onclick="adminSessionAction('${s.sessionId}', 'delete')"><i class="fa-solid fa-trash"></i> Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    tbody.innerHTML = html;
+                }
+            } catch (e) {
+                console.error('Fetch sessions error:', e);
+            }
+        }
+
+        async function adminSessionAction(sessionId, action) {
+            if (action === 'delete' && !confirm(`Permanently delete and purge user session [${sessionId}]?`)) return;
+
+            try {
+                const res = await apiFetch('/api/admin/session/action', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-admin-key': adminKey
+                    },
+                    body: JSON.stringify({ sessionId, action })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    fetchAdminSessions();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (e) {
+                alert('Action failed');
+            }
+        }
+
+        let allAdminSessionsCache = [];
+        async function viewSessionQR(sessionId) {
+            try {
+                const res = await apiFetch(`/api/status?sessionId=${encodeURIComponent(sessionId)}`);
+                const data = await res.json();
+
+                document.getElementById('modalSessionTitle').innerText = `Session: ${sessionId}`;
+                const container = document.getElementById('modalContent');
+
+                if (data.connected) {
+                    container.innerHTML = `
+                        <div style="padding: 20px; text-align: center;">
+                            <i class="fa-solid fa-circle-check fa-4x" style="color: #10b981; margin-bottom: 12px;"></i>
+                            <h4 style="font-size: 18px; color: white;">Bot Connected & Active</h4>
+                            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;">WhatsApp account is online and functioning.</p>
+                        </div>
+                    `;
+                } else if (data.qr) {
+                    container.innerHTML = `
+                        <div style="text-align: center;">
+                            <img src="${data.qr}" alt="QR Code" style="width: 220px; height: 220px; border-radius: 12px; margin-bottom: 12px;">
+                            <p style="font-size: 13px; color: var(--text-secondary);">Scan using WhatsApp Linked Devices</p>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div style="padding: 20px; text-align: center;">
+                            <i class="fa-solid fa-spinner fa-spin fa-3x" style="color: #3b82f6; margin-bottom: 12px;"></i>
+                            <p style="font-size: 14px; color: var(--text-secondary);">Waiting for connection or QR generation...</p>
+                        </div>
+                    `;
+                }
+                document.getElementById('sessionModal').style.display = 'flex';
+            } catch (e) {
+                alert('Error loading session detail');
+            }
+        }
+
+        async function openCreateModal() {
+            const phone = prompt("Enter phone number with country code for new user bot session (e.g. 923453684061):");
+            if (!phone) return;
+
+            const clean = phone.replace(/\D/g, '');
+            const newSessionId = `user_${clean}`;
+
+            try {
+                const res = await apiFetch('/api/session/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sessionId: newSessionId, phone: clean })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(`✅ Created user session ${newSessionId}.\nPairing Code: ${data.pairingCode || 'Generating...'}`);
+                if (data.success) {
+                    alert(`✅ Created user session ${newSessionId}.\nPairing Code: ${data.pairingCode || 'Generating...'}`);
+                    fetchAdminSessions();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (e) {
+                alert('Failed to create session');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('sessionModal').style.display = 'none';
+        }
+
+        if (adminKey) {
+            showAdminPanel();
+        }
+
+        setInterval(() => {
+            if (adminKey && document.getElementById('adminPanel').style.display !== 'none') {
+                fetchAdminSessions();
+            }
+        }, 4000);
+    </script>
+</body>
+</html>

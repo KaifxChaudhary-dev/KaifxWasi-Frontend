@@ -1,0 +1,12 @@
+{
+  "name": "kaifxwasi-frontend",
+  "version": "1.0.0",
+  "description": "Ultra-fast Modern Web Dashboard & Pairing Hub for KaifxWasi-Mini",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "keywords": ["whatsapp", "bot", "dashboard", "frontend", "vercel"],
+  "author": "Kaif (@KaifxChaudhary-dev)",
+  "license": "MIT"
+}
