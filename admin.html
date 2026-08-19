@@ -313,11 +313,24 @@
     <div id="loginScreen" class="login-box">
         <div class="login-icon"><i class="fa-solid fa-lock"></i></div>
         <h2 style="font-size: 22px; margin-bottom: 6px;">Admin Authorization</h2>
-        <p style="font-size: 13px; color: var(--text-secondary);">Enter master admin password to access session controls.</p>
-        <input type="password" id="adminPasswordInput" class="login-input" placeholder="Admin Password" onkeypress="if(event.key==='Enter') loginAdmin()" />
-        <button class="btn btn-primary" style="width: 100%; padding: 14px; justify-content: center;" onclick="loginAdmin()">
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">Enter master admin password to access session controls.</p>
+        
+        <input type="password" id="adminPasswordInput" class="login-input" placeholder="Enter Admin Password (e.g. kaifadmin123)" onkeypress="if(event.key==='Enter') loginAdmin()" />
+        
+        <button id="loginBtn" class="btn btn-primary" style="width: 100%; padding: 14px; justify-content: center; margin-bottom: 16px;" onclick="loginAdmin()">
             <i class="fa-solid fa-right-to-bracket"></i> Login to Admin Panel
         </button>
+
+        <div style="font-size: 11px; color: var(--text-secondary); border-top: 1px solid var(--border-glass); padding-top: 12px; text-align: left;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <span>Default Passwords:</span>
+                <strong style="color: #60a5fa; font-family: monospace;">kaifadmin123 / kaif123</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <span>Backend Target:</span>
+                <span id="loginTargetBackend" style="color: #10b981; font-family: monospace;">Connecting...</span>
+            </div>
+        </div>
     </div>
 
     <!-- Admin Control Panel View -->
@@ -633,8 +646,6 @@
                 const data = await res.json();
                 if (data.success) {
                     alert(`✅ Created user session ${newSessionId}.\nPairing Code: ${data.pairingCode || 'Generating...'}`);
-                if (data.success) {
-                    alert(`✅ Created user session ${newSessionId}.\nPairing Code: ${data.pairingCode || 'Generating...'}`);
                     fetchAdminSessions();
                 } else {
                     alert('Error: ' + data.error);
@@ -646,6 +657,17 @@
 
         function closeModal() {
             document.getElementById('sessionModal').style.display = 'none';
+        }
+
+        // Initialize Target Backend Label on Login Screen
+        const targetBackend = localStorage.getItem('kaif_backend_url') || HEROKU_BACKEND;
+        const targetEl = document.getElementById('loginTargetBackend');
+        if (targetEl) {
+            try {
+                targetEl.innerText = new URL(targetBackend).hostname;
+            } catch (e) {
+                targetEl.innerText = targetBackend;
+            }
         }
 
         if (adminKey) {
