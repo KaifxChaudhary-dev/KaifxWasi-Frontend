@@ -315,17 +315,13 @@
         <h2 style="font-size: 22px; margin-bottom: 6px;">Admin Authorization</h2>
         <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">Enter master admin password to access session controls.</p>
         
-        <input type="password" id="adminPasswordInput" class="login-input" placeholder="Enter Admin Password (e.g. kaifadmin123)" onkeypress="if(event.key==='Enter') loginAdmin()" />
+        <input type="password" id="adminPasswordInput" class="login-input" placeholder="Enter Master Admin Password" onkeypress="if(event.key==='Enter') loginAdmin()" />
         
         <button id="loginBtn" class="btn btn-primary" style="width: 100%; padding: 14px; justify-content: center; margin-bottom: 16px;" onclick="loginAdmin()">
             <i class="fa-solid fa-right-to-bracket"></i> Login to Admin Panel
         </button>
 
         <div style="font-size: 11px; color: var(--text-secondary); border-top: 1px solid var(--border-glass); padding-top: 12px; text-align: left;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                <span>Default Passwords:</span>
-                <strong style="color: #60a5fa; font-family: monospace;">kaifadmin123 / kaif123</strong>
-            </div>
             <div style="display: flex; justify-content: space-between; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                 <span>Backend Target:</span>
                 <span id="loginTargetBackend" style="color: #10b981; font-family: monospace;">Connecting...</span>
@@ -353,7 +349,7 @@
             </div>
         </div>
 
-        <!-- Backend API Configuration Card (Admin Only) -->
+        <!-- Backend API Configuration Card (Admin Managed) -->
         <div style="background: var(--bg-card); border: 1px solid var(--border-glow); border-radius: var(--radius-md); padding: 18px 24px; margin-bottom: 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
             <div style="display: flex; align-items: center; gap: 14px; flex: 1; min-width: 280px;">
                 <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(99, 102, 241, 0.15); display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--primary);">
@@ -364,12 +360,12 @@
                         <h4 style="font-size: 14px; font-weight: 700; color: white;">Heroku Backend API URL</h4>
                         <span id="adminBackendPingBadge" style="font-size: 11px; padding: 2px 8px; border-radius: 99px; background: rgba(16, 185, 129, 0.15); color: #10b981; font-weight: 700;">🟢 Live</span>
                     </div>
-                    <input type="text" id="adminBackendUrlInput" style="width: 100%; max-width: 480px; margin-top: 6px; padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--border-glass); border-radius: 8px; color: #f8fafc; font-size: 13px; font-family: monospace;" placeholder="https://kaifxwasi-backend-7a3a88dd4d0b.herokuapp.com">
+                    <input type="text" id="adminBackendUrlInput" style="width: 100%; max-width: 520px; margin-top: 6px; padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--border-glass); border-radius: 8px; color: #f8fafc; font-size: 13px; font-family: monospace;" placeholder="https://kaifxwasi-backend-7a3a88dd4d0b.herokuapp.com">
                 </div>
             </div>
-            <div>
-                <button class="btn btn-primary" onclick="saveAdminBackendUrl()" style="padding: 10px 18px; font-size: 13px;">
-                    <i class="fa-solid fa-floppy-disk"></i> Update Backend URL
+            <div style="display: flex; gap: 8px;">
+                <button class="btn btn-primary" id="saveBackendBtn" onclick="saveAdminBackendUrl()" style="padding: 10px 18px; font-size: 13px;">
+                    <i class="fa-solid fa-floppy-disk"></i> Test & Save Backend
                 </button>
             </div>
         </div>
@@ -379,7 +375,7 @@
             <div class="stat-card">
                 <div>
                     <h4>Active User Bots</h4>
-                    <p id="statActiveCount">0 / 50</p>
+                    <p id="statActiveCount">0 / 20</p>
                 </div>
                 <i class="fa-solid fa-users"></i>
             </div>
@@ -393,16 +389,19 @@
             <div class="stat-card">
                 <div>
                     <h4>Max Deployment Limit</h4>
-                    <p>50 Users</p>
+                    <p>20 Users</p>
                 </div>
                 <i class="fa-solid fa-server"></i>
             </div>
         </div>
 
         <!-- Section Header -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
             <h3 style="font-size: 18px; font-weight: 700;"><i class="fa-solid fa-list-check" style="color: var(--accent-primary);"></i> All User Sessions</h3>
             <div style="display: flex; gap: 10px;">
+                <button class="btn btn-danger" onclick="openDeleteSessionModal()">
+                    <i class="fa-solid fa-trash-can"></i> Delete Any Session
+                </button>
                 <button class="btn" onclick="fetchAdminSessions()">
                     <i class="fa-solid fa-rotate"></i> Refresh
                 </button>
@@ -446,12 +445,14 @@
 
     <script>
         const HEROKU_BACKEND = 'https://kaifxwasi-backend-7a3a88dd4d0b.herokuapp.com';
-        const API_BASE = (window.location.hostname.includes('vercel.app') || (window.location.hostname === 'localhost' && window.location.port !== '3000'))
-            ? (localStorage.getItem('kaif_backend_url') || HEROKU_BACKEND)
-            : '';
+
+        function getBackendUrl() {
+            return localStorage.getItem('kaif_backend_url') || HEROKU_BACKEND;
+        }
 
         function apiFetch(endpoint, options = {}) {
-            const url = endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint}`;
+            const base = getBackendUrl();
+            const url = endpoint.startsWith('http') ? endpoint : `${base}${endpoint}`;
             return fetch(url, options);
         }
 
@@ -477,7 +478,7 @@
                     alert('Error: ' + data.error);
                 }
             } catch (e) {
-                alert('Login failed. Check server status.');
+                alert('Login failed. Check backend server status or verify Heroku dyno.');
             }
         }
 
@@ -493,25 +494,97 @@
             document.getElementById('adminPanel').style.display = 'block';
 
             // Populate active backend URL input
-            const activeBackend = localStorage.getItem('kaif_backend_url') || HEROKU_BACKEND;
+            const activeBackend = getBackendUrl();
             const input = document.getElementById('adminBackendUrlInput');
             if (input) input.value = activeBackend;
 
             fetchAdminSessions();
         }
 
-        function saveAdminBackendUrl() {
+        async function saveAdminBackendUrl() {
             const input = document.getElementById('adminBackendUrlInput');
-            const val = (input.value || '').trim();
-            if (val) {
-                const cleaned = val.replace(/\/+$/, '');
-                localStorage.setItem('kaif_backend_url', cleaned);
-                alert('✅ Backend URL updated to: ' + cleaned);
-            } else {
+            const saveBtn = document.getElementById('saveBackendBtn');
+            const badge = document.getElementById('adminBackendPingBadge');
+            const raw = (input.value || '').trim();
+
+            if (!raw) {
                 localStorage.removeItem('kaif_backend_url');
-                alert('Reset to default Heroku backend URL.');
+                input.value = HEROKU_BACKEND;
+                if (badge) {
+                    badge.innerText = '🟢 Default Heroku';
+                    badge.style.color = '#10b981';
+                }
+                alert('Reset backend to default Heroku server: ' + HEROKU_BACKEND);
+                fetchAdminSessions();
+                return;
             }
-            window.location.reload();
+
+            const cleaned = raw.replace(/\/+$/, '');
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Testing...';
+            }
+            if (badge) {
+                badge.innerText = '🟡 Testing...';
+                badge.style.color = '#f59e0b';
+            }
+
+            try {
+                const startTime = Date.now();
+                const res = await fetch(`${cleaned}/api/stats`, { method: 'GET', signal: AbortSignal.timeout(8000) });
+                const latency = Date.now() - startTime;
+                
+                localStorage.setItem('kaif_backend_url', cleaned);
+                if (badge) {
+                    badge.innerText = `🟢 Connected (${latency}ms)`;
+                    badge.style.color = '#10b981';
+                }
+                alert(`✅ Successfully connected to backend!\nLatency: ${latency}ms\nSaved as active API endpoint.`);
+                fetchAdminSessions();
+            } catch (err) {
+                if (confirm(`⚠️ Could not reach backend at [${cleaned}]:\n${err.message}\n\nDo you want to save this URL anyway? (Useful if your Heroku dyno is currently waking up)`)) {
+                    localStorage.setItem('kaif_backend_url', cleaned);
+                    if (badge) {
+                        badge.innerText = '🟡 Saved (Unverified)';
+                        badge.style.color = '#f59e0b';
+                    }
+                }
+            } finally {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Test & Save Backend';
+                }
+            }
+        }
+
+        async function openDeleteSessionModal() {
+            const sid = prompt("Enter the exact Session ID you want to permanently delete from MongoDB & memory (e.g. user_923453684061):");
+            if (!sid) return;
+            const cleanSid = sid.trim();
+            if (!cleanSid) return;
+
+            if (!confirm(`Are you sure you want to permanently delete session [${cleanSid}]? This will purge all credentials.`)) return;
+
+            try {
+                const res = await apiFetch('/api/admin/session/action', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-admin-key': adminKey,
+                        'Authorization': adminKey
+                    },
+                    body: JSON.stringify({ sessionId: cleanSid, action: 'delete', adminKey })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(`✅ Session [${cleanSid}] has been completely deleted and purged.`);
+                    fetchAdminSessions();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (e) {
+                alert('Failed to delete session: ' + e.message);
+            }
         }
 
         async function fetchAdminSessions() {
