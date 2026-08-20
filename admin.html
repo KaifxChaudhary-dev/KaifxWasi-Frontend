@@ -569,10 +569,11 @@
         }
 
         function onCustomBackendInput(val) {
-            if (val && val.trim()) {
-                setBackendUrl(val);
+            const trimmed = (val || '').trim();
+            if (trimmed) {
+                localStorage.setItem('kaif_backend_url', trimmed);
                 const targetSpan = document.getElementById('loginTargetBackend');
-                if (targetSpan) targetSpan.innerText = val.trim();
+                if (targetSpan) targetSpan.innerText = trimmed;
             }
         }
 
@@ -704,18 +705,11 @@
             const raw = (input.value || '').trim();
 
             if (!raw) {
-                localStorage.removeItem('kaif_backend_url');
-                input.value = HEROKU_BACKEND;
-                if (badge) {
-                    badge.innerText = '🟢 Default Heroku';
-                    badge.style.color = '#10b981';
-                }
-                alert('Reset backend to default Heroku server: ' + HEROKU_BACKEND);
-                fetchAdminSessions();
+                alert('Please enter a valid Backend URL.');
                 return;
             }
 
-            const cleaned = raw.replace(/\/+$/, '');
+            const cleaned = setBackendUrl(raw);
             if (saveBtn) {
                 saveBtn.disabled = true;
                 saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Testing...';
@@ -933,17 +927,17 @@
         }
 
         // Initialize Target Backend Label on Login Screen
-        const targetBackend = localStorage.getItem('kaif_backend_url') || HEROKU_BACKEND;
+        const targetBackend = getBackendUrl();
         const targetEl = document.getElementById('loginTargetBackend');
         if (targetEl) {
             try {
-                targetEl.innerText = new URL(targetBackend).hostname;
+                targetEl.innerText = targetBackend ? (new URL(targetBackend).hostname) : 'Not configured';
             } catch (e) {
-                targetEl.innerText = targetBackend;
+                targetEl.innerText = targetBackend || 'Not configured';
             }
         }
 
-        if (adminKey) {
+        if (adminKey && getBackendUrl()) {
             showAdminPanel();
         }
 
