@@ -903,6 +903,8 @@
 
             const clean = phone.replace(/\D/g, '');
             const newSessionId = `user_${clean}`;
+            const currentUrl = getBackendUrl();
+            const servers = getSavedServers();
 
             try {
                 const res = await apiFetch('/api/session/create', {
@@ -911,6 +913,18 @@
                     body: JSON.stringify({ sessionId: newSessionId, phone: clean })
                 });
                 const data = await res.json();
+                
+                const isFull = (res.status === 429 || res.status === 503 || (data.error && data.error.toLowerCase().includes('limit reached')) || (data.error && data.error.toLowerCase().includes('max_sessions')));
+
+                if (isFull && servers.length > 1) {
+                    const otherServer = servers.find(s => s.url.toLowerCase() !== currentUrl.toLowerCase());
+                    if (otherServer && confirm(`⚠️ Current server is full (20/20).\n\nWould you like to automatically switch and create this session on [${otherServer.name}]?`)) {
+                        setBackendUrl(otherServer.url);
+                        populateServerDropdowns();
+                        return openCreateModal();
+                    }
+                }
+
                 if (data.success) {
                     alert(`✅ Created user session ${newSessionId}.\nPairing Code: ${data.pairingCode || 'Generating...'}`);
                     fetchAdminSessions();
@@ -918,7 +932,7 @@
                     alert('Error: ' + data.error);
                 }
             } catch (e) {
-                alert('Failed to create session');
+                alert('Failed to create session on ' + currentUrl);
             }
         }
 

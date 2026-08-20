@@ -1761,6 +1761,73 @@
             } catch (e) {}
         }
 
+        function getSavedServersList() {
+            try {
+                const raw = localStorage.getItem('kaif_saved_servers');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                }
+            } catch (e) {}
+            return [];
+        }
+
+        async function createSessionWithAutoFailover(cleanPhone, sessionId) {
+            const servers = getSavedServersList();
+            const current = getFrontendBackendUrl();
+            
+            // Re-order servers so current is tried first, followed by others
+            const serverQueue = [];
+            if (current) serverQueue.push(current);
+            servers.forEach(s => {
+                const url = s.url.replace(/\/+$/, '');
+                if (!serverQueue.includes(url)) serverQueue.push(url);
+            });
+
+            if (serverQueue.length === 0) {
+                throw new Error('No backend servers configured. Please add a backend server.');
+            }
+
+            let lastError = null;
+
+            for (let i = 0; i < serverQueue.length; i++) {
+                const targetServer = serverQueue[i];
+                try {
+                    const res = await fetch(`${targetServer}/api/session/create`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ phone: cleanPhone, sessionId })
+                    });
+
+                    const data = await res.json().catch(() => ({}));
+
+                    // Check if server is full or hit capacity limit
+                    const isFull = (res.status === 429 || res.status === 503 || (data.error && data.error.toLowerCase().includes('limit reached')) || (data.error && data.error.toLowerCase().includes('max_sessions')));
+
+                    if (!isFull && data.success && (data.pairingCode || data.code)) {
+                        if (targetServer !== current) {
+                            localStorage.setItem('kaif_backend_url', targetServer);
+                            showToast(`⚡ Switched to ${targetServer.replace(/^https?:\/\//, '').slice(0, 20)}... (Previous server was full)`, true);
+                        }
+                        return { data, serverUrl: targetServer };
+                    }
+
+                    if (isFull) {
+                        console.warn(`[Load Balancer] Server ${targetServer} is full. Checking next server...`);
+                        lastError = data.error || 'Server at max capacity (20/20). Auto-switching...';
+                        continue; // Try next server in cluster!
+                    }
+
+                    return { data, serverUrl: targetServer };
+                } catch (e) {
+                    console.warn(`[Load Balancer] Failed to reach ${targetServer}:`, e.message);
+                    lastError = e.message;
+                }
+            }
+
+            throw new Error(lastError || 'All configured servers are currently full or unreachable.');
+        }
+
         async function generatePairingCode() {
             const rawPhone = document.getElementById('phoneInput').value;
             const cleanPhone = rawPhone.replace(/\D/g, '');
@@ -1775,16 +1842,12 @@
 
             const btn = document.getElementById('getPairingCodeBtn');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating Code...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Finding Server & Pairing...';
 
             try {
-                const res = await apiFetch('/api/session/create', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone: cleanPhone, sessionId: currentSessionId })
-                });
-
-                const data = await res.json();
+                const result = await createSessionWithAutoFailover(cleanPhone, currentSessionId);
+                const data = result.data;
+                
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Generate Pairing Code';
 
@@ -1793,7 +1856,7 @@
                     const displayCode = code.includes('-') ? code : (code.slice(0, 4) + '-' + code.slice(4));
                     document.getElementById('pairingCodeVal').innerText = displayCode;
                     document.getElementById('codeDisplayArea').style.display = 'block';
-                    showToast('Pairing code generated successfully!', true);
+                    showToast('✅ Pairing code generated successfully!', true);
 
                     startStatusPolling();
                 } else {
@@ -1802,7 +1865,7 @@
             } catch (e) {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Generate Pairing Code';
-                showToast('Network error requesting pairing code', false);
+                showToast(`❌ ${e.message}`, false);
             }
         }
 
