@@ -1701,15 +1701,29 @@
         typeLoop();
 
         // -------------------------------------------------------------
-        // PAIRING API INTEGRATION (Vercel & Heroku Compatible)
+        // PAIRING API INTEGRATION (Multi-Server & Vercel Compatible)
         // -------------------------------------------------------------
-        const HEROKU_BACKEND = 'https://kaifxwasi-backend-7a3a88dd4d0b.herokuapp.com';
-        const API_BASE = (window.location.hostname.includes('vercel.app') || (window.location.hostname === 'localhost' && window.location.port !== '3000'))
-            ? (localStorage.getItem('kaif_backend_url') || HEROKU_BACKEND)
-            : '';
+        function getFrontendBackendUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const queryUrl = params.get('server') || params.get('backend');
+            if (queryUrl) return queryUrl.replace(/\/+$/, '');
+
+            let url = localStorage.getItem('kaif_backend_url') || localStorage.getItem('backend_url');
+            if (!url) {
+                try {
+                    const raw = localStorage.getItem('kaif_saved_servers');
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (Array.isArray(parsed) && parsed.length > 0) url = parsed[0].url;
+                    }
+                } catch (e) {}
+            }
+            return (url || 'https://kaifxwasi-backend-7a3a88dd4d0b.herokuapp.com').replace(/\/+$/, '');
+        }
 
         function apiFetch(endpoint, options = {}) {
-            const url = endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint}`;
+            const base = getFrontendBackendUrl();
+            const url = endpoint.startsWith('http') ? endpoint : `${base}${endpoint}`;
             return fetch(url, options);
         }
 

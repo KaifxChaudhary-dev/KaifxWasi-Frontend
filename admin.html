@@ -313,18 +313,26 @@
     <div id="loginScreen" class="login-box">
         <div class="login-icon"><i class="fa-solid fa-lock"></i></div>
         <h2 style="font-size: 22px; margin-bottom: 6px;">Admin Authorization</h2>
-        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">Enter your backend URL and master admin password.</p>
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">Select or enter your backend server cluster.</p>
         
         <div style="text-align: left; margin-bottom: 12px;">
-            <label style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">
-                <i class="fa-solid fa-server" style="color: var(--primary);"></i> Heroku Backend URL
-            </label>
-            <input type="text" id="loginBackendUrlInput" class="login-input" style="font-family: monospace; font-size: 13px;" placeholder="https://your-app.herokuapp.com" />
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <label style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">
+                    <i class="fa-solid fa-server" style="color: var(--primary);"></i> Server Cluster Node
+                </label>
+                <a href="javascript:void(0)" onclick="promptAddNewServer()" style="font-size: 11px; color: var(--accent-primary); text-decoration: none; font-weight: 600;">
+                    <i class="fa-solid fa-plus"></i> Add Server
+                </a>
+            </div>
+            <select id="loginServerSelect" class="login-input" style="font-family: monospace; font-size: 13px; margin-bottom: 8px; cursor: pointer;" onchange="onLoginServerSelectChange(this.value)">
+                <!-- Populated dynamically -->
+            </select>
+            <input type="text" id="loginBackendUrlInput" class="login-input" style="font-family: monospace; font-size: 13px;" placeholder="https://your-app.herokuapp.com" oninput="onCustomBackendInput(this.value)" />
         </div>
 
         <div style="text-align: left; margin-bottom: 16px;">
             <label style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">
-                <i class="fa-solid fa-key" style="color: var(--emerald);"></i> Admin Password
+                <i class="fa-solid fa-key" style="color: var(--emerald);"></i> Master Admin Password
             </label>
             <input type="password" id="adminPasswordInput" class="login-input" placeholder="Enter Master Admin Password" onkeypress="if(event.key==='Enter') loginAdmin()" />
         </div>
@@ -351,12 +359,21 @@
                 </div>
                 <div class="brand-title">
                     <h1>KaifxWasi-Mini Admin Panel</h1>
-                    <p>Multi-Tenant Session Management & Controls</p>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                        <span id="activeServerNameBadge" style="font-size: 12px; font-weight: 700; color: white;">Server 1</span>
+                        <span id="adminBackendPingBadge" style="font-size: 11px; padding: 2px 8px; border-radius: 99px; background: rgba(16, 185, 129, 0.15); color: #10b981; font-weight: 700;">🟢 Live</span>
+                    </div>
                 </div>
             </div>
-            <div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                <select id="headerServerSelect" class="login-input" style="width: auto; padding: 8px 14px; font-size: 13px; cursor: pointer; background: var(--bg-card);" onchange="switchAdminServer(this.value)">
+                    <!-- Populated dynamically -->
+                </select>
+                <button class="btn" onclick="promptAddNewServer()">
+                    <i class="fa-solid fa-plus"></i> Add Server
+                </button>
                 <button class="btn btn-danger" onclick="logoutAdmin()">
-                    <i class="fa-solid fa-power-off"></i> Exit Admin
+                    <i class="fa-solid fa-power-off"></i> Logout
                 </button>
             </div>
         </div>
@@ -456,14 +473,39 @@
     </div>
 
     <script>
-        const HEROKU_BACKEND = 'https://kaifxwasi-backend-7a3a88dd4d0b.herokuapp.com';
+        const DEFAULT_SERVERS = [
+            { name: 'Server 1 (Primary)', url: 'https://kaifxwasi-backend-7a3a88dd4d0b.herokuapp.com' }
+        ];
+
+        function getSavedServers() {
+            try {
+                const raw = localStorage.getItem('kaif_saved_servers');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                }
+            } catch (e) {}
+            return [...DEFAULT_SERVERS];
+        }
+
+        function saveServersList(servers) {
+            localStorage.setItem('kaif_saved_servers', JSON.stringify(servers));
+        }
 
         function getBackendUrl() {
-            let url = localStorage.getItem('kaif_backend_url') || localStorage.getItem('backend_url') || HEROKU_BACKEND;
+            const params = new URLSearchParams(window.location.search);
+            const queryUrl = params.get('server') || params.get('backend');
+            if (queryUrl) return queryUrl.replace(/\/+$/, '');
+
+            let url = localStorage.getItem('kaif_backend_url') || localStorage.getItem('backend_url');
+            if (!url) {
+                const servers = getSavedServers();
+                url = servers[0]?.url || 'https://kaifxwasi-backend-7a3a88dd4d0b.herokuapp.com';
+            }
             return url.replace(/\/+$/, '');
         }
 
-        function setBackendUrl(url) {
+        function setBackendUrl(url, serverName = null) {
             let clean = String(url || '').trim().replace(/\/+$/, '');
             if (clean && !clean.startsWith('http://') && !clean.startsWith('https://')) {
                 clean = 'https://' + clean;
@@ -471,8 +513,101 @@
             if (clean) {
                 localStorage.setItem('kaif_backend_url', clean);
                 localStorage.setItem('backend_url', clean);
+
+                // Add to saved list if not present
+                const servers = getSavedServers();
+                let existing = servers.find(s => s.url.toLowerCase() === clean.toLowerCase());
+                if (!existing) {
+                    const name = serverName || `Server ${servers.length + 1}`;
+                    servers.push({ name, url: clean });
+                    saveServersList(servers);
+                }
             }
             return clean || getBackendUrl();
+        }
+
+        function populateServerDropdowns() {
+            const servers = getSavedServers();
+            const currentUrl = getBackendUrl().toLowerCase();
+
+            const loginSelect = document.getElementById('loginServerSelect');
+            const headerSelect = document.getElementById('headerServerSelect');
+
+            let optionsHtml = '';
+            let matched = false;
+
+            servers.forEach((s, idx) => {
+                const isSelected = s.url.toLowerCase() === currentUrl;
+                if (isSelected) matched = true;
+                optionsHtml += `<option value="${s.url}" ${isSelected ? 'selected' : ''}>🌐 ${s.name} (${s.url.replace(/^https?:\/\//, '').slice(0, 24)}...)</option>`;
+            });
+
+            optionsHtml += `<option value="__custom__">✏️ Custom URL...</option>`;
+            optionsHtml += `<option value="__add__">➕ Add New Server Node...</option>`;
+
+            if (loginSelect) loginSelect.innerHTML = optionsHtml;
+            if (headerSelect) headerSelect.innerHTML = optionsHtml;
+
+            const activeServer = servers.find(s => s.url.toLowerCase() === currentUrl);
+            const badgeName = activeServer ? activeServer.name : 'Custom Server';
+            const badgeEl = document.getElementById('activeServerNameBadge');
+            if (badgeEl) badgeEl.innerText = badgeName;
+        }
+
+        function onLoginServerSelectChange(val) {
+            if (val === '__add__') {
+                promptAddNewServer();
+                return;
+            }
+            if (val === '__custom__') {
+                document.getElementById('loginBackendUrlInput').focus();
+                return;
+            }
+            setBackendUrl(val);
+            updateLoginDisplay();
+        }
+
+        function onCustomBackendInput(val) {
+            if (val && val.trim()) {
+                setBackendUrl(val);
+                const targetSpan = document.getElementById('loginTargetBackend');
+                if (targetSpan) targetSpan.innerText = val.trim();
+            }
+        }
+
+        function promptAddNewServer() {
+            const name = prompt('Enter a friendly name for this server (e.g. "Server 2 Heroku"):');
+            if (!name || !name.trim()) return;
+            const url = prompt('Enter the Backend URL (e.g. "https://my-server-2.herokuapp.com"):');
+            if (!url || !url.trim()) return;
+
+            const cleanUrl = setBackendUrl(url, name.trim());
+            populateServerDropdowns();
+            updateLoginDisplay();
+            alert(`✅ Added and switched to [${name.trim()}]: ${cleanUrl}`);
+
+            if (document.getElementById('adminPanel').style.display !== 'none') {
+                fetchAdminSessions();
+            }
+        }
+
+        function switchAdminServer(url) {
+            if (url === '__add__') {
+                promptAddNewServer();
+                return;
+            }
+            if (url === '__custom__') {
+                const custom = prompt('Enter custom Backend URL:');
+                if (custom && custom.trim()) {
+                    setBackendUrl(custom);
+                    populateServerDropdowns();
+                    fetchAdminSessions();
+                }
+                return;
+            }
+            setBackendUrl(url);
+            populateServerDropdowns();
+            fetchAdminSessions();
         }
 
         function updateLoginDisplay() {
@@ -481,6 +616,7 @@
             if (input) input.value = current;
             const targetSpan = document.getElementById('loginTargetBackend');
             if (targetSpan) targetSpan.innerText = current;
+            populateServerDropdowns();
         }
 
         updateLoginDisplay();
@@ -530,7 +666,7 @@
                     alert('Error: ' + (data.error || 'Authentication failed.'));
                 }
             } catch (e) {
-                alert(`❌ Cannot connect to backend server at:\n${getBackendUrl()}\n\nMake sure your Heroku Dyno is awake, or enter the correct backend URL in the box above!`);
+                alert(`❌ Cannot connect to server at:\n${getBackendUrl()}\n\nMake sure your Heroku Dyno is awake and running!`);
             } finally {
                 if (loginBtn) {
                     loginBtn.disabled = false;
@@ -556,6 +692,7 @@
             const input = document.getElementById('adminBackendUrlInput');
             if (input) input.value = activeBackend;
 
+            populateServerDropdowns();
             fetchAdminSessions();
         }
 
