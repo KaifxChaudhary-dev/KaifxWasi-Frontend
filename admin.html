@@ -3,29 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KaifxWasi-Mini Admin Panel</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>KaifxWasi-Mini — Admin Cluster Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #090d16;
-            --bg-card: #131b2e;
-            --bg-hover: #1c2744;
-            --accent-primary: #3b82f6;
-            --accent-success: #10b981;
-            --accent-warning: #f59e0b;
-            --accent-danger: #ef4444;
+            --bg-dark: #070913;
+            --bg-card: rgba(16, 23, 48, 0.75);
+            --bg-card-hover: rgba(24, 34, 70, 0.9);
+            --bg-input: rgba(11, 16, 36, 0.95);
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.4);
+            --emerald: #10b981;
+            --emerald-glow: rgba(16, 185, 129, 0.4);
+            --warning: #f59e0b;
+            --danger: #ef4444;
             --text-main: #f8fafc;
-            --text-secondary: #94a3b8;
+            --text-muted: #94a3b8;
             --card-border: rgba(255, 255, 255, 0.08);
-            --card-glow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            --card-glow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-full: 9999px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         body {
@@ -36,25 +44,96 @@
             display: flex;
             justify-content: center;
             align-items: flex-start;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
         }
 
-        .admin-container {
+        .ambient-canvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
             width: 100%;
             max-width: 1100px;
-            background: var(--bg-card);
-            border-radius: 28px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 20px;
+            font-size: 13.5px;
+            font-weight: 700;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
             border: 1px solid var(--card-border);
-            padding: 32px;
-            box-shadow: var(--card-glow);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            text-decoration: none;
+            outline: none;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.95;
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        .login-input {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 13px 16px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .login-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
         }
 
         /* Login Screen */
         .login-box {
-            max-width: 440px;
-            margin: 80px auto;
+            max-width: 450px;
+            margin: 60px auto;
             text-align: center;
             background: var(--bg-card);
-            border-radius: 28px;
+            backdrop-filter: blur(24px);
+            border-radius: var(--radius-lg);
             border: 1px solid var(--card-border);
             padding: 40px;
             box-shadow: var(--card-glow);
@@ -63,42 +142,32 @@
         .login-icon {
             width: 64px;
             height: 64px;
-            background: linear-gradient(135deg, #ef4444, #f59e0b);
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
             border-radius: 20px;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             font-size: 28px;
-            color: white;
-            margin: 0 auto 18px auto;
-            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
+            color: #818cf8;
+            margin: 0 auto 20px;
         }
 
-        .login-input {
-            width: 100%;
-            padding: 16px;
-            border-radius: 14px;
+        /* Main Admin App Container */
+        .admin-app {
+            background: var(--bg-card);
+            backdrop-filter: blur(24px);
+            border-radius: var(--radius-lg);
             border: 1px solid var(--card-border);
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            font-size: 16px;
-            margin: 16px 0;
-            outline: none;
-            text-align: center;
+            padding: 32px;
+            box-shadow: var(--card-glow);
         }
 
-        .login-input:focus {
-            border-color: var(--accent-primary);
-        }
-
-        /* Header */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 28px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--card-border);
             flex-wrap: wrap;
             gap: 16px;
         }
@@ -106,193 +175,153 @@
         .brand-section {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
         }
 
         .brand-icon {
-            width: 52px;
-            height: 52px;
-            background: linear-gradient(135deg, #ef4444, #3b82f6);
-            border-radius: 16px;
+            width: 46px;
+            height: 46px;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 14px;
             display: flex;
-            justify-content: center;
             align-items: center;
-            font-size: 24px;
-            color: white;
-            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+            justify-content: center;
+            font-size: 22px;
+            color: #818cf8;
         }
 
         .brand-title h1 {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 800;
+            letter-spacing: -0.5px;
         }
 
         .brand-title p {
-            font-size: 13px;
-            color: var(--text-secondary);
+            font-size: 12.5px;
+            color: var(--text-muted);
         }
 
         /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 16px;
             margin-bottom: 28px;
         }
 
         .stat-card {
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--card-border);
-            border-radius: 18px;
-            padding: 20px;
+            border-radius: var(--radius-md);
+            padding: 20px 22px;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
         .stat-card h4 {
-            font-size: 12px;
-            color: var(--text-secondary);
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-muted);
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .stat-card p {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 800;
+            color: white;
             margin-top: 4px;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .stat-card i {
-            font-size: 24px;
-            color: var(--accent-primary);
-            opacity: 0.8;
+            font-size: 26px;
+            color: #818cf8;
         }
 
-        /* Table */
+        /* Sessions Table */
         .table-container {
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.25);
             border: 1px solid var(--card-border);
-            overflow: hidden;
-            margin-bottom: 24px;
+            border-radius: var(--radius-md);
+            overflow-x: auto;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             text-align: left;
+            font-size: 13.5px;
         }
 
         th {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.04);
             padding: 16px 20px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
-            color: var(--text-secondary);
-            text-transform: uppercase;
+            color: var(--text-muted);
             border-bottom: 1px solid var(--card-border);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         td {
             padding: 16px 20px;
-            font-size: 14px;
-            border-bottom: 1px solid var(--card-border);
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover td {
-            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         }
 
         .status-pill {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 100px;
-            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11.5px;
             font-weight: 700;
         }
 
         .status-pill.online {
-            background: rgba(16, 185, 129, 0.12);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.25);
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
         .status-pill.waiting {
-            background: rgba(245, 158, 11, 0.12);
-            color: #f59e0b;
-            border: 1px solid rgba(245, 158, 11, 0.25);
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
         }
 
         .status-pill.offline {
-            background: rgba(239, 68, 68, 0.12);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.25);
-        }
-
-        /* Buttons */
-        .btn {
-            padding: 8px 14px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            border: 1px solid var(--card-border);
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-main);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s ease;
-        }
-
-        .btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .btn-primary {
-            background: var(--accent-primary);
-            border-color: var(--accent-primary);
-            color: white;
-        }
-
-        .btn-danger {
             background: rgba(239, 68, 68, 0.15);
-            border-color: rgba(239, 68, 68, 0.3);
-            color: #ef4444;
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
-        .btn-danger:hover {
-            background: rgba(239, 68, 68, 0.3);
-        }
-
-        /* Modal */
+        /* Modal Overlay */
         .modal-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
             align-items: center;
             justify-content: center;
-            z-index: 999;
+            z-index: 9999;
             padding: 20px;
         }
 
         .modal-card {
-            background: #121827;
+            background: #0f172a;
             border: 1px solid var(--card-border);
-            border-radius: 24px;
+            border-radius: var(--radius-lg);
             padding: 32px;
             max-width: 440px;
             width: 100%;
             text-align: center;
             position: relative;
+            box-shadow: var(--card-glow);
         }
 
         .modal-close {
@@ -301,173 +330,153 @@
             right: 16px;
             background: none;
             border: none;
-            color: var(--text-secondary);
-            font-size: 20px;
+            color: var(--text-muted);
+            font-size: 22px;
             cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <!-- Login View -->
-    <div id="loginScreen" class="login-box">
-        <div class="login-icon"><i class="fa-solid fa-lock"></i></div>
-        <h2 style="font-size: 22px; margin-bottom: 6px;">Admin Authorization</h2>
-        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">Select or enter your backend server cluster.</p>
+    <div class="container">
         
-        <div style="text-align: left; margin-bottom: 12px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <label style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">
-                    <i class="fa-solid fa-server" style="color: var(--primary);"></i> Server Cluster Node
-                </label>
-                <a href="javascript:void(0)" onclick="promptAddNewServer()" style="font-size: 11px; color: var(--accent-primary); text-decoration: none; font-weight: 600;">
-                    <i class="fa-solid fa-plus"></i> Add Server
-                </a>
-            </div>
-            <select id="loginServerSelect" class="login-input" style="font-family: monospace; font-size: 13px; margin-bottom: 8px; cursor: pointer;" onchange="onLoginServerSelectChange(this.value)">
-                <!-- Populated dynamically -->
-            </select>
-            <input type="text" id="loginBackendUrlInput" class="login-input" style="font-family: monospace; font-size: 13px;" placeholder="https://your-app.herokuapp.com" oninput="onCustomBackendInput(this.value)" />
-        </div>
-
-        <div style="text-align: left; margin-bottom: 16px;">
-            <label style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">
-                <i class="fa-solid fa-key" style="color: var(--emerald);"></i> Master Admin Password
-            </label>
-            <input type="password" id="adminPasswordInput" class="login-input" placeholder="Enter Master Admin Password" onkeypress="if(event.key==='Enter') loginAdmin()" />
-        </div>
-        
-        <button id="loginBtn" class="btn btn-primary" style="width: 100%; padding: 14px; justify-content: center; margin-bottom: 16px;" onclick="loginAdmin()">
-            <i class="fa-solid fa-right-to-bracket"></i> Login to Admin Panel
-        </button>
-
-        <div style="font-size: 11px; color: var(--text-secondary); border-top: 1px solid var(--border-glass); padding-top: 12px; text-align: left;">
-            <div style="display: flex; justify-content: space-between; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                <span>Active Target:</span>
-                <span id="loginTargetBackend" style="color: #10b981; font-family: monospace;">Connecting...</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Admin Control Panel View -->
-    <div id="adminPanel" class="admin-container" style="display: none;">
-        <!-- Header -->
-        <div class="header">
-            <div class="brand-section">
-                <div class="brand-icon">
-                    <i class="fa-solid fa-user-shield"></i>
+        <!-- Login View -->
+        <div id="loginScreen" class="login-box">
+            <div class="login-icon"><i class="fa-solid fa-user-shield"></i></div>
+            <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 6px;">Admin Authorization</h2>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 22px;">Select server cluster and enter master password.</p>
+            
+            <div style="text-align: left; margin-bottom: 14px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <label style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
+                        <i class="fa-solid fa-server" style="color: #818cf8;"></i> Server Cluster Node
+                    </label>
+                    <a href="javascript:void(0)" onclick="promptAddNewServer()" style="font-size: 11.5px; color: #818cf8; text-decoration: none; font-weight: 700;">
+                        <i class="fa-solid fa-plus"></i> Add Node
+                    </a>
                 </div>
-                <div class="brand-title">
-                    <h1>KaifxWasi-Mini Admin Panel</h1>
-                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
-                        <span id="activeServerNameBadge" style="font-size: 12px; font-weight: 700; color: white;">Server 1</span>
-                        <span id="adminBackendPingBadge" style="font-size: 11px; padding: 2px 8px; border-radius: 99px; background: rgba(16, 185, 129, 0.15); color: #10b981; font-weight: 700;">🟢 Live</span>
-                    </div>
-                </div>
-            </div>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                <select id="headerServerSelect" class="login-input" style="width: auto; padding: 8px 14px; font-size: 13px; cursor: pointer; background: var(--bg-card);" onchange="switchAdminServer(this.value)">
+                <select id="loginServerSelect" class="login-input" style="font-family: monospace; font-size: 13px; margin-bottom: 8px; cursor: pointer;" onchange="onLoginServerSelectChange(this.value)">
                     <!-- Populated dynamically -->
                 </select>
-                <button class="btn" onclick="promptAddNewServer()">
-                    <i class="fa-solid fa-plus"></i> Add Server
-                </button>
-                <button class="btn btn-danger" onclick="logoutAdmin()">
-                    <i class="fa-solid fa-power-off"></i> Logout
-                </button>
+                <input type="text" id="loginBackendUrlInput" class="login-input" style="font-family: monospace; font-size: 13px;" placeholder="https://your-backend.herokuapp.com" oninput="onCustomBackendInput(this.value)" />
+            </div>
+
+            <div style="text-align: left; margin-bottom: 18px;">
+                <label style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 6px;">
+                    <i class="fa-solid fa-key" style="color: var(--emerald);"></i> Master Admin Password
+                </label>
+                <input type="password" id="adminPasswordInput" class="login-input" placeholder="Enter Password" onkeypress="if(event.key==='Enter') loginAdmin()" />
+            </div>
+            
+            <button id="loginBtn" class="btn btn-primary" style="width: 100%; padding: 14px;" onclick="loginAdmin()">
+                <i class="fa-solid fa-right-to-bracket"></i> Login to Admin Panel
+            </button>
+
+            <div style="font-size: 11.5px; color: var(--text-muted); border-top: 1px solid var(--card-border); padding-top: 14px; margin-top: 18px; text-align: left;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Active Target:</span>
+                    <span id="loginTargetBackend" style="color: #34d399; font-family: monospace;">Connecting...</span>
+                </div>
             </div>
         </div>
 
-        <!-- Backend API Configuration Card (Admin Managed) -->
-        <div style="background: var(--bg-card); border: 1px solid var(--border-glow); border-radius: var(--radius-md); padding: 18px 24px; margin-bottom: 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
-            <div style="display: flex; align-items: center; gap: 14px; flex: 1; min-width: 280px;">
-                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(99, 102, 241, 0.15); display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--primary);">
+        <!-- Admin Control Panel View -->
+        <div id="adminPanel" class="admin-app" style="display: none;">
+            <!-- Header -->
+            <div class="header">
+                <div class="brand-section">
+                    <div class="brand-icon">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <div class="brand-title">
+                        <h1>KaifxWasi-Mini Multi-Cluster Admin</h1>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                            <span id="activeServerNameBadge" style="font-size: 12px; font-weight: 700; color: white;">Server 1</span>
+                            <span id="adminBackendPingBadge" style="font-size: 11px; padding: 2px 8px; border-radius: 99px; background: rgba(16, 185, 129, 0.15); color: #10b981; font-weight: 700;">🟢 Live</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                    <select id="headerServerSelect" class="login-input" style="width: auto; padding: 8px 14px; font-size: 13px; cursor: pointer;" onchange="switchAdminServer(this.value)">
+                        <!-- Populated dynamically -->
+                    </select>
+                    <button class="btn" onclick="promptAddNewServer()">
+                        <i class="fa-solid fa-plus"></i> Add Server Node
+                    </button>
+                    <button class="btn btn-danger" onclick="logoutAdmin()">
+                        <i class="fa-solid fa-power-off"></i> Logout
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div>
+                        <h4>Active User Bots</h4>
+                        <p id="statActiveCount">0 / 20</p>
+                    </div>
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div class="stat-card">
+                    <div>
+                        <h4>Registered Sessions</h4>
+                        <p id="statTotalReg">0</p>
+                    </div>
+                    <i class="fa-solid fa-database"></i>
+                </div>
+                <div class="stat-card">
+                    <div>
+                        <h4>Max Node Limit</h4>
+                        <p>20 Users</p>
+                    </div>
                     <i class="fa-solid fa-server"></i>
                 </div>
-                <div style="flex: 1;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <h4 style="font-size: 14px; font-weight: 700; color: white;">Heroku Backend API URL</h4>
-                        <span id="adminBackendPingBadge" style="font-size: 11px; padding: 2px 8px; border-radius: 99px; background: rgba(16, 185, 129, 0.15); color: #10b981; font-weight: 700;">🟢 Live</span>
-                    </div>
-                    <input type="text" id="adminBackendUrlInput" style="width: 100%; max-width: 520px; margin-top: 6px; padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--border-glass); border-radius: 8px; color: #f8fafc; font-size: 13px; font-family: monospace;" placeholder="https://your-backend-app.herokuapp.com">
+            </div>
+
+            <!-- Section Controls -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                <h3 style="font-size: 18px; font-weight: 800;"><i class="fa-solid fa-list-check" style="color: #818cf8;"></i> Live User Sessions</h3>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn" onclick="fetchAdminSessions()">
+                        <i class="fa-solid fa-rotate"></i> Refresh
+                    </button>
+                    <button class="btn btn-primary" onclick="openCreateModal()">
+                        <i class="fa-solid fa-plus"></i> + Create Session
+                    </button>
                 </div>
             </div>
-            <div style="display: flex; gap: 8px;">
-                <button class="btn btn-primary" id="saveBackendBtn" onclick="saveAdminBackendUrl()" style="padding: 10px 18px; font-size: 13px;">
-                    <i class="fa-solid fa-floppy-disk"></i> Test & Save Backend
-                </button>
+
+            <!-- Sessions Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Session ID</th>
+                            <th>WhatsApp Phone</th>
+                            <th>Status</th>
+                            <th>Pairing Code</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sessionsTableBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 32px;">
+                                Loading active user sessions...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- Stats Grid -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div>
-                    <h4>Active User Bots</h4>
-                    <p id="statActiveCount">0 / 20</p>
-                </div>
-                <i class="fa-solid fa-users"></i>
-            </div>
-            <div class="stat-card">
-                <div>
-                    <h4>Registered Sessions</h4>
-                    <p id="statTotalReg">0</p>
-                </div>
-                <i class="fa-solid fa-database"></i>
-            </div>
-            <div class="stat-card">
-                <div>
-                    <h4>Max Deployment Limit</h4>
-                    <p>20 Users</p>
-                </div>
-                <i class="fa-solid fa-server"></i>
-            </div>
-        </div>
-
-        <!-- Section Header -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
-            <h3 style="font-size: 18px; font-weight: 700;"><i class="fa-solid fa-list-check" style="color: var(--accent-primary);"></i> All User Sessions</h3>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn btn-danger" onclick="openDeleteSessionModal()">
-                    <i class="fa-solid fa-trash-can"></i> Delete Any Session
-                </button>
-                <button class="btn" onclick="fetchAdminSessions()">
-                    <i class="fa-solid fa-rotate"></i> Refresh
-                </button>
-                <button class="btn btn-primary" onclick="openCreateModal()">
-                    <i class="fa-solid fa-plus"></i> + Create Session
-                </button>
-            </div>
-        </div>
-
-        <!-- Sessions Table -->
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Session ID</th>
-                        <th>WhatsApp Phone</th>
-                        <th>Status</th>
-                        <th>Pairing Code</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="sessionsTableBody">
-                    <tr>
-                        <td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 30px;">
-                            Loading active user sessions...
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
     </div>
 
     <!-- Session Detail Modal (QR / Code) -->
     <div id="sessionModal" class="modal-overlay">
         <div class="modal-card">
             <button class="modal-close" onclick="closeModal()">&times;</button>
-            <h3 id="modalSessionTitle" style="font-size: 20px; margin-bottom: 12px;">Session Details</h3>
+            <h3 id="modalSessionTitle" style="font-size: 20px; font-weight: 800; margin-bottom: 14px; color: white;">Session Details</h3>
             <div id="modalContent"></div>
         </div>
     </div>
@@ -503,9 +512,6 @@
                 const servers = getSavedServers();
                 url = servers[0]?.url || PRIMARY_DEFAULT_BACKEND;
             }
-            if (!url && window.location.hostname !== 'localhost' && !window.location.hostname.includes('vercel.app')) {
-                url = window.location.origin;
-            }
             return (url || PRIMARY_DEFAULT_BACKEND).replace(/\/+$/, '');
         }
 
@@ -518,7 +524,6 @@
                 localStorage.setItem('kaif_backend_url', clean);
                 localStorage.setItem('backend_url', clean);
 
-                // Add to saved list if not present
                 const servers = getSavedServers();
                 let existing = servers.find(s => s.url.toLowerCase() === clean.toLowerCase());
                 if (!existing) {
@@ -538,11 +543,8 @@
             const headerSelect = document.getElementById('headerServerSelect');
 
             let optionsHtml = '';
-            let matched = false;
-
-            servers.forEach((s, idx) => {
+            servers.forEach(s => {
                 const isSelected = s.url.toLowerCase() === currentUrl;
-                if (isSelected) matched = true;
                 optionsHtml += `<option value="${s.url}" ${isSelected ? 'selected' : ''}>🌐 ${s.name} (${s.url.replace(/^https?:\/\//, '').slice(0, 24)}...)</option>`;
             });
 
@@ -583,7 +585,7 @@
         function promptAddNewServer() {
             const name = prompt('Enter a friendly name for this server (e.g. "Server 2 Heroku"):');
             if (!name || !name.trim()) return;
-            const url = prompt('Enter the Backend URL (e.g. "https://my-server-2.herokuapp.com"):');
+            const url = prompt('Enter Backend URL (e.g. "https://my-backend-2.herokuapp.com"):');
             if (!url || !url.trim()) return;
 
             const cleanUrl = setBackendUrl(url, name.trim());
@@ -620,7 +622,13 @@
             const input = document.getElementById('loginBackendUrlInput');
             if (input) input.value = current;
             const targetSpan = document.getElementById('loginTargetBackend');
-            if (targetSpan) targetSpan.innerText = current;
+            if (targetSpan) {
+                try {
+                    targetSpan.innerText = new URL(current).hostname;
+                } catch (e) {
+                    targetSpan.innerText = current;
+                }
+            }
             populateServerDropdowns();
         }
 
@@ -691,101 +699,16 @@
         function showAdminPanel() {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
-
-            // Populate active backend URL input
-            const activeBackend = getBackendUrl();
-            const input = document.getElementById('adminBackendUrlInput');
-            if (input) input.value = activeBackend;
-
             populateServerDropdowns();
             fetchAdminSessions();
-        }
-
-        async function saveAdminBackendUrl() {
-            const input = document.getElementById('adminBackendUrlInput');
-            const saveBtn = document.getElementById('saveBackendBtn');
-            const badge = document.getElementById('adminBackendPingBadge');
-            const raw = (input.value || '').trim();
-
-            if (!raw) {
-                alert('Please enter a valid Backend URL.');
-                return;
-            }
-
-            const cleaned = setBackendUrl(raw);
-            if (saveBtn) {
-                saveBtn.disabled = true;
-                saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Testing...';
-            }
-            if (badge) {
-                badge.innerText = '🟡 Testing...';
-                badge.style.color = '#f59e0b';
-            }
-
-            try {
-                const startTime = Date.now();
-                const res = await fetch(`${cleaned}/api/stats`, { method: 'GET', signal: AbortSignal.timeout(8000) });
-                const latency = Date.now() - startTime;
-                
-                localStorage.setItem('kaif_backend_url', cleaned);
-                if (badge) {
-                    badge.innerText = `🟢 Connected (${latency}ms)`;
-                    badge.style.color = '#10b981';
-                }
-                alert(`✅ Successfully connected to backend!\nLatency: ${latency}ms\nSaved as active API endpoint.`);
-                fetchAdminSessions();
-            } catch (err) {
-                if (confirm(`⚠️ Could not reach backend at [${cleaned}]:\n${err.message}\n\nDo you want to save this URL anyway? (Useful if your Heroku dyno is currently waking up)`)) {
-                    localStorage.setItem('kaif_backend_url', cleaned);
-                    if (badge) {
-                        badge.innerText = '🟡 Saved (Unverified)';
-                        badge.style.color = '#f59e0b';
-                    }
-                }
-            } finally {
-                if (saveBtn) {
-                    saveBtn.disabled = false;
-                    saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Test & Save Backend';
-                }
-            }
-        }
-
-        async function openDeleteSessionModal() {
-            const sid = prompt("Enter the exact Session ID you want to permanently delete from MongoDB & memory (e.g. user_923453684061):");
-            if (!sid) return;
-            const cleanSid = sid.trim();
-            if (!cleanSid) return;
-
-            if (!confirm(`Are you sure you want to permanently delete session [${cleanSid}]? This will purge all credentials.`)) return;
-
-            try {
-                const res = await apiFetch('/api/admin/session/action', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-admin-key': adminKey,
-                        'Authorization': adminKey
-                    },
-                    body: JSON.stringify({ sessionId: cleanSid, action: 'delete', adminKey })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    alert(`✅ Session [${cleanSid}] has been completely deleted and purged.`);
-                    fetchAdminSessions();
-                } else {
-                    alert('Error: ' + data.error);
-                }
-            } catch (e) {
-                alert('Failed to delete session: ' + e.message);
-            }
         }
 
         async function fetchAdminSessions() {
             if (!adminKey) return logoutAdmin();
 
             try {
-                const res = await apiFetch(`/api/admin/sessions?adminKey=${encodeURIComponent(adminKey)}`, {
-                    headers: {
+                const res = await apiFetch('/api/admin/sessions', {
+                    headers: { 
                         'x-admin-key': adminKey,
                         'Authorization': adminKey
                     }
@@ -798,12 +721,12 @@
 
                 const data = await res.json();
                 if (data.success) {
-                    document.getElementById('statActiveCount').innerText = `${data.activeCount} / ${data.maxSessions}`;
+                    document.getElementById('statActiveCount').innerText = `${data.activeCount} / ${data.maxSessions || 20}`;
                     document.getElementById('statTotalReg').innerText = data.totalRegistered;
 
                     const tbody = document.getElementById('sessionsTableBody');
                     if (!data.sessions || data.sessions.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 30px;">No user sessions registered yet. Click "+ Create Session" to add one.</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 32px;">No user sessions registered yet. Click "+ Create Session" to add one.</td></tr>';
                         return;
                     }
 
@@ -819,12 +742,12 @@
                                 <td><strong style="font-family: monospace; color: white;">${s.sessionId}</strong></td>
                                 <td>${phone}</td>
                                 <td><span class="status-pill ${statusClass}">${statusLabel}</span></td>
-                                <td><span style="font-family: monospace; color: #10b981;">${code}</span></td>
+                                <td><span style="font-family: monospace; color: #10b981; font-weight: 700;">${code}</span></td>
                                 <td>
                                     <div style="display: flex; gap: 6px;">
-                                        <button class="btn" onclick="viewSessionQR('${s.sessionId}')"><i class="fa-solid fa-qrcode"></i> QR/Code</button>
-                                        <button class="btn" onclick="adminSessionAction('${s.sessionId}', 'restart')"><i class="fa-solid fa-rotate"></i></button>
-                                        <button class="btn btn-danger" onclick="adminSessionAction('${s.sessionId}', 'delete')"><i class="fa-solid fa-trash"></i> Delete</button>
+                                        <button class="btn" style="padding: 6px 12px; font-size: 12px;" onclick="viewSessionQR('${s.sessionId}')"><i class="fa-solid fa-qrcode"></i> QR</button>
+                                        <button class="btn" style="padding: 6px 12px; font-size: 12px;" onclick="adminSessionAction('${s.sessionId}', 'restart')"><i class="fa-solid fa-rotate"></i></button>
+                                        <button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="adminSessionAction('${s.sessionId}', 'delete')"><i class="fa-solid fa-trash"></i></button>
                                     </div>
                                 </td>
                             </tr>
@@ -848,7 +771,7 @@
                         'x-admin-key': adminKey,
                         'Authorization': adminKey
                     },
-                    body: JSON.stringify({ sessionId, action, adminKey })
+                    body: JSON.stringify({ sessionId, action })
                 });
 
                 const data = await res.json();
@@ -862,7 +785,6 @@
             }
         }
 
-        let allAdminSessionsCache = [];
         async function viewSessionQR(sessionId) {
             try {
                 const res = await apiFetch(`/api/status?sessionId=${encodeURIComponent(sessionId)}`);
@@ -874,23 +796,23 @@
                 if (data.connected) {
                     container.innerHTML = `
                         <div style="padding: 20px; text-align: center;">
-                            <i class="fa-solid fa-circle-check fa-4x" style="color: #10b981; margin-bottom: 12px;"></i>
+                            <i class="fa-solid fa-circle-check fa-4x" style="color: #10b981; margin-bottom: 14px;"></i>
                             <h4 style="font-size: 18px; color: white;">Bot Connected & Active</h4>
-                            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;">WhatsApp account is online and functioning.</p>
+                            <p style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">WhatsApp account is online and functioning in memory.</p>
                         </div>
                     `;
                 } else if (data.qr) {
                     container.innerHTML = `
                         <div style="text-align: center;">
                             <img src="${data.qr}" alt="QR Code" style="width: 220px; height: 220px; border-radius: 12px; margin-bottom: 12px;">
-                            <p style="font-size: 13px; color: var(--text-secondary);">Scan using WhatsApp Linked Devices</p>
+                            <p style="font-size: 13px; color: var(--text-muted);">Scan using WhatsApp Linked Devices</p>
                         </div>
                     `;
                 } else {
                     container.innerHTML = `
                         <div style="padding: 20px; text-align: center;">
-                            <i class="fa-solid fa-spinner fa-spin fa-3x" style="color: #3b82f6; margin-bottom: 12px;"></i>
-                            <p style="font-size: 14px; color: var(--text-secondary);">Waiting for connection or QR generation...</p>
+                            <i class="fa-solid fa-spinner fa-spin fa-3x" style="color: #6366f1; margin-bottom: 12px;"></i>
+                            <p style="font-size: 14px; color: var(--text-muted);">Connecting socket or waiting for pairing...</p>
                         </div>
                     `;
                 }
@@ -941,17 +863,6 @@
 
         function closeModal() {
             document.getElementById('sessionModal').style.display = 'none';
-        }
-
-        // Initialize Target Backend Label on Login Screen
-        const targetBackend = getBackendUrl();
-        const targetEl = document.getElementById('loginTargetBackend');
-        if (targetEl) {
-            try {
-                targetEl.innerText = targetBackend ? (new URL(targetBackend).hostname) : 'Not configured';
-            } catch (e) {
-                targetEl.innerText = targetBackend || 'Not configured';
-            }
         }
 
         if (adminKey && getBackendUrl()) {

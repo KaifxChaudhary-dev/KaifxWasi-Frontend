@@ -3,28 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KaifxWasi-Mini — Powerful WhatsApp Automation & Pairing</title>
-    <meta name="description" content="KaifxWasi-Mini (WASI-MD-V7) is a state-of-the-art multi-tenant WhatsApp bot platform featuring instant pairing, AI commands, anti-delete, media downloaders, and group management.">
+    <title>KaifxWasi-Mini — Next-Gen Multi-Cluster WhatsApp Automation</title>
+    <meta name="description" content="KaifxWasi-Mini (WASI-MD-V7) is a high-speed multi-tenant WhatsApp bot platform featuring instant code pairing, AI commands, media downloaders, and cluster load balancing.">
     
     <!-- Google Fonts & Font Awesome -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
         :root {
-            --bg-base: #060812;
-            --bg-surface: #0c1022;
-            --bg-card: rgba(15, 22, 45, 0.7);
-            --bg-card-hover: rgba(23, 33, 65, 0.85);
-            --bg-input: rgba(13, 19, 39, 0.95);
+            --bg-base: #070913;
+            --bg-surface: #0e1326;
+            --bg-card: rgba(16, 23, 48, 0.72);
+            --bg-card-hover: rgba(24, 34, 70, 0.85);
+            --bg-input: rgba(11, 16, 36, 0.95);
             
             --primary: #6366f1;
-            --primary-glow: rgba(99, 102, 241, 0.4);
+            --primary-glow: rgba(99, 102, 241, 0.45);
             --secondary: #8b5cf6;
-            --cyan: #06b6d4;
+            --secondary-glow: rgba(139, 92, 246, 0.35);
             --emerald: #10b981;
+            --emerald-glow: rgba(16, 185, 129, 0.4);
+            --cyan: #06b6d4;
             --rose: #f43f5e;
             --amber: #f59e0b;
             
@@ -33,8 +35,9 @@
             --text-dim: #64748b;
             
             --border-glass: rgba(255, 255, 255, 0.08);
-            --border-glow: rgba(99, 102, 241, 0.4);
-            --shadow-glass: 0 20px 50px -10px rgba(0, 0, 0, 0.6);
+            --border-glow: rgba(99, 102, 241, 0.35);
+            --shadow-glass: 0 25px 60px -15px rgba(0, 0, 0, 0.7);
+            
             --radius-sm: 10px;
             --radius-md: 16px;
             --radius-lg: 24px;
@@ -46,7 +49,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Outfit', -apple-system, sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             scroll-behavior: smooth;
         }
 
@@ -55,11 +58,12 @@
             color: var(--text-main);
             overflow-x: hidden;
             line-height: 1.6;
+            min-height: 100vh;
             position: relative;
         }
 
         /* -------------------------------------------------------------
-           AMBIENT ANIMATED BLOBS
+           AMBIENT ANIMATED BLOBS & BACKGROUND MESH
         ------------------------------------------------------------- */
         .ambient-canvas {
             position: fixed;
@@ -75,124 +79,127 @@
         .blob {
             position: absolute;
             border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.25;
-            animation: floatBlob 20s infinite alternate ease-in-out;
+            filter: blur(120px);
+            opacity: 0.22;
+            animation: floatBlob 22s infinite alternate ease-in-out;
         }
 
         .blob-1 {
-            width: 550px;
-            height: 550px;
-            background: linear-gradient(135deg, #6366f1, #3b82f6);
-            top: -100px;
-            left: -100px;
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(135deg, var(--primary), #3b82f6);
+            top: -120px;
+            left: -120px;
         }
 
         .blob-2 {
-            width: 600px;
-            height: 600px;
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
-            top: 40%;
-            right: -150px;
-            animation-duration: 25s;
-            animation-delay: -5s;
+            width: 650px;
+            height: 650px;
+            background: linear-gradient(135deg, var(--secondary), #ec4899);
+            top: 35%;
+            right: -180px;
+            animation-duration: 26s;
+            animation-delay: -6s;
         }
 
         .blob-3 {
-            width: 450px;
-            height: 450px;
-            background: linear-gradient(135deg, #06b6d4, #10b981);
-            bottom: -50px;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, var(--emerald), var(--cyan));
+            bottom: -100px;
             left: 20%;
-            animation-duration: 18s;
+            animation-duration: 20s;
             animation-delay: -10s;
         }
 
         @keyframes floatBlob {
             0% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(80px, 60px) scale(1.1); }
-            100% { transform: translate(-60px, 90px) scale(0.95); }
+            50% { transform: translate(60px, 40px) scale(1.08); }
+            100% { transform: translate(-40px, 80px) scale(0.95); }
         }
 
-        /* -------------------------------------------------------------
-           TYPOGRAPHY & GLOBAL HELPERS
-        ------------------------------------------------------------- */
+        /* Container */
         .container {
-            width: 100%;
-            max-width: 1240px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 24px;
             position: relative;
             z-index: 1;
         }
 
+        /* Gradient Text */
         .gradient-text {
-            background: linear-gradient(135deg, #fff 20%, #a5b4fc 60%, #c084fc 100%);
+            background: linear-gradient(135deg, #fff 30%, var(--text-muted) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .gradient-accent {
-            background: linear-gradient(135deg, #818cf8, #c084fc, #38bdf8);
+            background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #38bdf8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .section-header {
-            text-align: center;
-            max-width: 680px;
-            margin: 0 auto 56px auto;
-        }
-
-        .section-tag {
+        /* Buttons */
+        .btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 6px 16px;
-            border-radius: var(--radius-full);
-            background: rgba(99, 102, 241, 0.12);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            font-size: 13px;
+            justify-content: center;
+            gap: 10px;
+            padding: 13px 24px;
+            font-size: 14.5px;
             font-weight: 700;
-            color: #a5b4fc;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 16px;
-        }
-
-        .section-title {
-            font-size: clamp(32px, 4vw, 44px);
-            font-weight: 800;
-            letter-spacing: -1px;
-            line-height: 1.2;
-            margin-bottom: 16px;
-        }
-
-        .section-subtitle {
-            font-size: 17px;
-            color: var(--text-muted);
-            font-weight: 400;
-        }
-
-        /* -------------------------------------------------------------
-           STICKY NAVBAR
-        ------------------------------------------------------------- */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 100;
-            padding: 20px 0;
+            border-radius: var(--radius-md);
+            cursor: pointer;
             transition: var(--transition);
+            border: none;
+            outline: none;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
         }
 
-        .navbar.scrolled {
-            padding: 14px 0;
-            background: rgba(6, 8, 18, 0.88);
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: 0 8px 25px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.6);
+            opacity: 0.95;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-ghost {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid var(--border-glass);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Navbar */
+        .navbar {
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            background: rgba(7, 9, 19, 0.8);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-glass);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            z-index: 100;
+            transition: var(--transition);
         }
 
         .nav-inner {
@@ -228,130 +235,41 @@
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 32px;
+            gap: 28px;
             list-style: none;
         }
 
         .nav-link {
             text-decoration: none;
             color: var(--text-muted);
-            font-size: 15px;
+            font-size: 14.5px;
             font-weight: 600;
             transition: var(--transition);
-            position: relative;
         }
 
         .nav-link:hover {
             color: var(--text-main);
         }
 
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            transition: var(--transition);
-            border-radius: 2px;
-        }
-
-        .nav-link:hover::after {
-            width: 100%;
-        }
-
         .nav-actions {
             display: flex;
             align-items: center;
-            gap: 16px;
-        }
-
-        .btn-ghost {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 18px;
-            border-radius: var(--radius-md);
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-glass);
-            color: var(--text-main);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-
-        .btn-ghost:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .btn-primary {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 12px 24px;
-            border-radius: var(--radius-md);
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            color: white;
-            text-decoration: none;
-            font-size: 15px;
-            font-weight: 700;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 10px 25px -5px var(--primary-glow);
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.6s;
-        }
-
-        .btn-primary:hover::before {
-            left: 100%;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px -5px rgba(99, 102, 241, 0.6);
+            gap: 12px;
         }
 
         .mobile-menu-btn {
             display: none;
             background: none;
             border: none;
-            color: var(--text-main);
-            font-size: 24px;
+            color: white;
+            font-size: 22px;
             cursor: pointer;
         }
 
-        /* -------------------------------------------------------------
-           HERO SECTION (PAIRING CARD DIRECTLY AT TOP)
-        ------------------------------------------------------------- */
+        /* Hero Section */
         .hero-section {
-            min-height: 100vh;
-            padding: 140px 0 80px 0;
-            display: flex;
-            align-items: center;
-        }
-
-        .hero-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 48px;
-            align-items: center;
+            padding: 48px 0 60px;
+            position: relative;
         }
 
         .status-badge {
@@ -362,12 +280,12 @@
             border-radius: var(--radius-full);
             background: rgba(16, 185, 129, 0.1);
             border: 1px solid rgba(16, 185, 129, 0.3);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .pulse-dot {
-            width: 10px;
-            height: 10px;
+            width: 9px;
+            height: 9px;
             border-radius: 50%;
             background: var(--emerald);
             box-shadow: 0 0 12px var(--emerald);
@@ -380,55 +298,17 @@
         }
 
         .status-badge-text {
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 800;
             letter-spacing: 1px;
             color: var(--emerald);
             text-transform: uppercase;
         }
 
-        .hero-title {
-            font-size: clamp(36px, 4.4vw, 56px);
-            font-weight: 900;
-            letter-spacing: -1.5px;
-            line-height: 1.15;
-            margin-bottom: 20px;
-        }
-
-        .hero-subtitle {
-            font-size: 17.5px;
-            color: var(--text-muted);
-            font-weight: 400;
-            line-height: 1.7;
-            margin-bottom: 30px;
-        }
-
-        .hero-stats-mini {
-            display: flex;
-            align-items: center;
-            gap: 28px;
-            padding-top: 24px;
-            border-top: 1px solid var(--border-glass);
-        }
-
-        .stat-mini-item h4 {
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--text-main);
-        }
-
-        .stat-mini-item p {
-            font-size: 13px;
-            color: var(--text-dim);
-            font-weight: 600;
-        }
-
-        /* -------------------------------------------------------------
-           HERO PAIRING PORTAL (GLASS CARD AT STARTING PAGE)
-        ------------------------------------------------------------- */
+        /* Hero Pairing Portal Card */
         .hero-pairing-card {
             background: var(--bg-card);
-            backdrop-filter: blur(24px);
+            backdrop-filter: blur(28px);
             border: 1px solid var(--border-glass);
             border-radius: var(--radius-lg);
             padding: 36px 32px;
@@ -449,29 +329,85 @@
             pointer-events: none;
         }
 
-        .pairing-card-header {
-            text-align: center;
+        /* Cluster Server Bar (Directly Above Input) */
+        .cluster-node-bar {
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
             margin-bottom: 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
         }
 
-        .pairing-card-header h2 {
-            font-size: 24px;
+        .cluster-node-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow: hidden;
+            flex: 1;
+        }
+
+        .node-pill {
+            font-size: 11px;
             font-weight: 800;
-            margin-bottom: 6px;
+            padding: 3px 9px;
+            border-radius: var(--radius-full);
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
         }
 
-        .pairing-card-header p {
-            font-size: 14px;
-            color: var(--text-muted);
+        .node-url-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12.5px;
+            color: #f1f5f9;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
+        .node-latency-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11.5px;
+            color: var(--text-dim);
+            flex-shrink: 0;
+        }
+
+        .btn-change-server {
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid var(--border-glow);
+            color: #a5b4fc;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 6px 14px;
+            border-radius: 8px;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+
+        .btn-change-server:hover {
+            background: rgba(99, 102, 241, 0.3);
+            color: white;
+        }
+
+        /* Pairing Tabs */
         .pairing-tabs {
             display: flex;
-            background: rgba(6, 8, 18, 0.7);
+            background: rgba(6, 8, 18, 0.75);
             padding: 6px;
             border-radius: var(--radius-md);
             border: 1px solid var(--border-glass);
-            margin-bottom: 22px;
+            margin-bottom: 24px;
             gap: 6px;
         }
 
@@ -508,14 +444,16 @@
 
         .input-box {
             margin-bottom: 20px;
+            text-align: left;
         }
 
         .input-label {
             display: block;
-            font-size: 13.5px;
+            font-size: 13px;
             font-weight: 700;
             color: var(--text-muted);
             margin-bottom: 8px;
+            letter-spacing: 0.2px;
         }
 
         .phone-input-group {
@@ -547,12 +485,13 @@
         .custom-input:focus {
             border-color: var(--primary);
             box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+            background: rgba(15, 23, 50, 0.95);
         }
 
         .btn-full {
             width: 100%;
             padding: 16px;
-            font-size: 16px;
+            font-size: 15.5px;
         }
 
         /* Result Code Box */
@@ -563,7 +502,7 @@
             border-radius: var(--radius-md);
             padding: 24px;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 22px;
             animation: fadeIn 0.4s ease;
         }
 
@@ -575,14 +514,14 @@
         .code-header-text {
             font-size: 12px;
             font-weight: 800;
-            color: var(--text-muted);
+            color: var(--emerald);
             letter-spacing: 2px;
             text-transform: uppercase;
         }
 
         .code-string {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 34px;
+            font-size: 36px;
             font-weight: 900;
             letter-spacing: 6px;
             color: var(--emerald);
@@ -591,7 +530,7 @@
         }
 
         .btn-copy {
-            padding: 10px 20px;
+            padding: 11px 22px;
             border-radius: var(--radius-sm);
             border: none;
             background: var(--emerald);
@@ -616,7 +555,7 @@
             font-size: 13px;
             color: var(--text-muted);
             line-height: 1.7;
-            background: rgba(0, 0, 0, 0.35);
+            background: rgba(0, 0, 0, 0.4);
             padding: 16px 18px;
             border-radius: var(--radius-sm);
             border: 1px solid var(--border-glass);
@@ -649,431 +588,203 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 16px;
-            overflow: hidden;
+            margin-bottom: 20px;
             position: relative;
+            overflow: hidden;
         }
 
-        /* Success Connected Screen */
+        /* Connected State Screen */
         .connected-state-card {
             display: none;
             text-align: center;
-            padding: 30px 10px;
-            animation: fadeIn 0.5s ease;
+            padding: 20px 0;
         }
 
         .connected-big-icon {
-            width: 72px;
-            height: 72px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             background: rgba(16, 185, 129, 0.15);
             border: 2px solid var(--emerald);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 34px;
+            font-size: 36px;
             color: var(--emerald);
-            margin: 0 auto 16px auto;
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+            margin: 0 auto 20px;
+            box-shadow: 0 0 30px var(--emerald-glow);
+            animation: bounceIn 0.5s ease;
         }
 
-        /* -------------------------------------------------------------
-           STATISTICS SECTION
-        ------------------------------------------------------------- */
+        @keyframes bounceIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Stats Grid */
         .stats-section {
-            padding: 60px 0;
-            position: relative;
+            padding: 40px 0;
         }
 
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
+            gap: 20px;
         }
 
         .stat-card {
             background: var(--bg-card);
-            backdrop-filter: blur(16px);
+            backdrop-filter: blur(20px);
             border: 1px solid var(--border-glass);
             border-radius: var(--radius-md);
-            padding: 28px 20px;
+            padding: 24px 20px;
             text-align: center;
             transition: var(--transition);
         }
 
         .stat-card:hover {
-            transform: translateY(-6px);
+            transform: translateY(-4px);
             border-color: var(--border-glow);
-            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.2);
         }
 
         .stat-number {
-            font-size: 38px;
+            font-size: 32px;
             font-weight: 900;
-            letter-spacing: -1px;
             margin-bottom: 4px;
-            display: inline-block;
         }
 
         .stat-label {
-            font-size: 14.5px;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        /* -------------------------------------------------------------
-           FEATURES GRID
-        ------------------------------------------------------------- */
-        .features-section {
-            padding: 90px 0;
-            position: relative;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
-        }
-
-        .feature-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--border-glass);
-            border-radius: var(--radius-md);
-            padding: 30px 24px;
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            opacity: 0;
-            transition: var(--transition);
-        }
-
-        .feature-card:hover {
-            transform: translateY(-6px);
-            background: var(--bg-card-hover);
-            border-color: var(--border-glow);
-            box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.25);
-        }
-
-        .feature-card:hover::before {
-            opacity: 1;
-        }
-
-        .feature-icon-wrapper {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
-            background: rgba(99, 102, 241, 0.12);
-            border: 1px solid rgba(99, 102, 241, 0.25);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            margin-bottom: 18px;
-            transition: var(--transition);
-        }
-
-        .feature-card:hover .feature-icon-wrapper {
-            transform: scale(1.1) rotate(5deg);
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-        }
-
-        .feature-title {
-            font-size: 19px;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .feature-desc {
-            font-size: 14px;
-            color: var(--text-muted);
-            line-height: 1.6;
-        }
-
-        /* -------------------------------------------------------------
-           COMMAND PREVIEW TERMINAL
-        ------------------------------------------------------------- */
-        .terminal-section {
-            padding: 80px 0;
-        }
-
-        .terminal-box {
-            max-width: 800px;
-            margin: 0 auto;
-            background: #080c18;
-            border-radius: var(--radius-lg);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 40px rgba(99, 102, 241, 0.15);
-            overflow: hidden;
-        }
-
-        .terminal-bar {
-            background: #0e1424;
-            padding: 14px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border-glass);
-        }
-
-        .terminal-dots {
-            display: flex;
-            gap: 8px;
-        }
-
-        .dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-
-        .dot-red { background: #ef4444; }
-        .dot-yellow { background: #f59e0b; }
-        .dot-green { background: #10b981; }
-
-        .terminal-title {
             font-size: 13px;
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--text-dim);
+            color: var(--text-muted);
             font-weight: 600;
         }
 
-        .terminal-body {
-            padding: 28px 32px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 15px;
-            line-height: 2;
-            color: #38bdf8;
-            min-height: 280px;
-        }
-
-        .term-prompt {
-            color: var(--emerald);
-            font-weight: 700;
-        }
-
-        .cursor-blink {
-            display: inline-block;
-            width: 9px;
-            height: 18px;
-            background: #38bdf8;
-            margin-left: 4px;
-            vertical-align: middle;
-            animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
-            0%, 49% { opacity: 1; }
-            50%, 100% { opacity: 0; }
-        }
-
-        /* -------------------------------------------------------------
-           TECHNOLOGY STACK
-        ------------------------------------------------------------- */
-        .tech-section {
+        /* Command Showcase Section */
+        .commands-section {
             padding: 60px 0;
+        }
+
+        .section-header {
             text-align: center;
-        }
-
-        .tech-grid {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 18px;
-        }
-
-        .tech-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 24px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-glass);
-            border-radius: var(--radius-md);
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--text-main);
-            transition: var(--transition);
-        }
-
-        .tech-badge:hover {
-            transform: translateY(-4px);
-            border-color: var(--border-glow);
-            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
-        }
-
-        .tech-badge i {
-            font-size: 18px;
-            color: var(--primary);
-        }
-
-        /* -------------------------------------------------------------
-           FAQ ACCORDION
-        ------------------------------------------------------------- */
-        .faq-section {
-            padding: 90px 0;
-        }
-
-        .faq-grid {
-            max-width: 800px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .faq-item {
-            background: var(--bg-card);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--border-glass);
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            transition: var(--transition);
-        }
-
-        .faq-item.active {
-            border-color: var(--border-glow);
-        }
-
-        .faq-question {
-            padding: 20px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 16.5px;
-            font-weight: 700;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .faq-question i {
-            font-size: 13px;
-            color: var(--text-dim);
-            transition: var(--transition);
-        }
-
-        .faq-item.active .faq-question i {
-            transform: rotate(180deg);
-            color: var(--primary);
-        }
-
-        .faq-answer {
-            max-height: 0;
-            overflow: hidden;
-            padding: 0 24px;
-            color: var(--text-muted);
-            font-size: 14.5px;
-            line-height: 1.7;
-            transition: all 0.35s ease;
-        }
-
-        .faq-item.active .faq-answer {
-            max-height: 220px;
-            padding-bottom: 20px;
-        }
-
-        /* -------------------------------------------------------------
-           FINAL CTA SECTION
-        ------------------------------------------------------------- */
-        .cta-section {
-            padding: 90px 0;
-        }
-
-        .cta-box {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.25));
-            border: 1px solid rgba(99, 102, 241, 0.4);
-            border-radius: var(--radius-lg);
-            padding: 50px 32px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(99, 102, 241, 0.2);
-        }
-
-        .cta-box h2 {
-            font-size: clamp(30px, 3.8vw, 44px);
-            font-weight: 900;
-            margin-bottom: 14px;
-            letter-spacing: -1px;
-        }
-
-        .cta-box p {
-            font-size: 17px;
-            color: var(--text-muted);
-            max-width: 600px;
-            margin: 0 auto 30px auto;
-        }
-
-        /* -------------------------------------------------------------
-           FOOTER
-        ------------------------------------------------------------- */
-        .footer {
-            padding: 60px 0 30px 0;
-            border-top: 1px solid var(--border-glass);
-            background: #04060c;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 40px;
             margin-bottom: 40px;
         }
 
-        .footer-brand p {
-            font-size: 14px;
-            color: var(--text-dim);
-            margin-top: 12px;
-            max-width: 320px;
+        .section-title {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-bottom: 12px;
         }
 
-        .footer-col h4 {
-            font-size: 15px;
-            font-weight: 800;
-            margin-bottom: 16px;
-            color: var(--text-main);
-        }
-
-        .footer-col ul {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .footer-col a {
-            text-decoration: none;
+        .section-desc {
+            font-size: 15.5px;
             color: var(--text-muted);
-            font-size: 14px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .command-filters {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .filter-chip {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-glass);
+            color: var(--text-muted);
+            padding: 8px 18px;
+            border-radius: var(--radius-full);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
             transition: var(--transition);
         }
 
-        .footer-col a:hover {
-            color: var(--primary);
+        .filter-chip.active, .filter-chip:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 15px var(--primary-glow);
         }
 
-        .footer-bottom {
-            padding-top: 24px;
-            border-top: 1px solid var(--border-glass);
+        .commands-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .cmd-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            transition: var(--transition);
+        }
+
+        .cmd-card:hover {
+            border-color: var(--border-glow);
+            transform: translateY(-3px);
+            background: var(--bg-card-hover);
+        }
+
+        .cmd-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 15px;
+            font-weight: 700;
+            color: #818cf8;
+            margin-bottom: 6px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            font-size: 13.5px;
-            color: var(--text-dim);
+            gap: 8px;
         }
 
-        /* Toast Notification */
+        .cmd-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: #0f172a;
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            max-width: 480px;
+            width: 100%;
+            position: relative;
+            box-shadow: var(--shadow-glass);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -1090,7 +801,7 @@
             display: none;
             align-items: center;
             gap: 10px;
-            z-index: 1000;
+            z-index: 10000;
             animation: slideIn 0.3s ease;
         }
 
@@ -1101,24 +812,8 @@
 
         /* Responsive Breakpoints */
         @media (max-width: 992px) {
-            .hero-grid {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
-            .hero-content {
-                text-align: center;
-            }
-            .hero-subtitle {
-                margin: 0 auto 24px auto;
-            }
-            .hero-stats-mini {
-                justify-content: center;
-            }
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
-            }
-            .footer-grid {
-                grid-template-columns: 1fr 1fr;
             }
         }
 
@@ -1129,43 +824,18 @@
             .mobile-menu-btn {
                 display: block;
             }
-            .mobile-drawer {
-                position: fixed;
-                top: 70px;
-                left: 0;
-                width: 100%;
-                background: rgba(6, 8, 18, 0.95);
-                backdrop-filter: blur(20px);
-                padding: 24px;
-                border-bottom: 1px solid var(--border-glass);
-                display: none;
-                flex-direction: column;
-                gap: 16px;
-                z-index: 99;
-            }
-            .mobile-drawer.open {
-                display: flex;
-            }
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
             .hero-pairing-card {
                 padding: 24px 18px;
             }
-            .footer-grid {
+            .stats-grid {
                 grid-template-columns: 1fr;
-            }
-            .footer-bottom {
-                flex-direction: column;
-                gap: 14px;
-                text-align: center;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Ambient Glowing Blobs -->
+    <!-- Ambient Background Blobs -->
     <div class="ambient-canvas">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
@@ -1178,7 +848,7 @@
         <span id="toastMsg">Notification Message</span>
     </div>
 
-    <!-- Navigation -->
+    <!-- Navigation Header -->
     <nav class="navbar" id="navbar">
         <div class="container nav-inner">
             <a href="#" class="brand-logo">
@@ -1190,60 +860,55 @@
 
             <ul class="nav-links">
                 <li><a href="#hero" class="nav-link">Home</a></li>
-                <li><a href="#features" class="nav-link">Features</a></li>
-                <li><a href="#hero" class="nav-link">Pair Now</a></li>
+                <li><a href="#hero" class="nav-link">Pair WhatsApp</a></li>
                 <li><a href="#commands" class="nav-link">Commands</a></li>
+                <li><a href="#clusters" class="nav-link">Multi-Cluster</a></li>
                 <li><a href="#faq" class="nav-link">FAQ</a></li>
             </ul>
 
             <div class="nav-actions">
-                <a href="/admin" class="btn-ghost" title="Admin Portal">
-                    <i class="fa-solid fa-shield-halved"></i> Admin
+                <a href="/admin.html" class="btn btn-ghost" title="Admin Cluster Dashboard">
+                    <i class="fa-solid fa-user-shield"></i> Admin Panel
                 </a>
-                <a href="#hero" class="btn-primary">
-                    <i class="fa-solid fa-bolt"></i> Pair WhatsApp
+                <a href="#hero" class="btn btn-primary">
+                    <i class="fa-solid fa-bolt"></i> Pair Now
                 </a>
-                <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
             </div>
-        </div>
-
-        <!-- Mobile Drawer -->
-        <div class="mobile-drawer" id="mobileDrawer">
-            <a href="#hero" class="nav-link" onclick="toggleMobileMenu()">Home</a>
-            <a href="#features" class="nav-link" onclick="toggleMobileMenu()">Features</a>
-            <a href="#hero" class="nav-link" onclick="toggleMobileMenu()">Pair Now</a>
-            <a href="#commands" class="nav-link" onclick="toggleMobileMenu()">Commands</a>
-            <a href="#faq" class="nav-link" onclick="toggleMobileMenu()">FAQ</a>
-            <a href="https://github.com/Itxxwasi/WASI-MD-V7" target="_blank" class="btn-ghost" style="text-align: center;">
-                <i class="fa-brands fa-github"></i> Repository
-            </a>
-            <a href="#hero" class="btn-primary" onclick="toggleMobileMenu()">
-                <i class="fa-solid fa-bolt"></i> Pair WhatsApp
-            </a>
         </div>
     </nav>
 
-    <!-- Hero Section (PAIRING & QR CODE DIRECTLY AT TOP FIRST) -->
+    <!-- Hero Section (PAIRING & QR CODE PORTAL) -->
     <section class="hero-section" id="hero">
-        <div class="container" style="max-width: 680px;">
-            <!-- Top Status & Brand Header -->
+        <div class="container" style="max-width: 650px;">
+            <!-- Brand & Status Header -->
             <div style="text-align: center; margin-bottom: 24px;">
-                <div class="status-badge" style="margin-bottom: 14px;">
+                <div class="status-badge">
                     <div class="pulse-dot"></div>
-                    <span class="status-badge-text">● BOT ONLINE & READY</span>
+                    <span class="status-badge-text" id="heroCapacity">CLUSTER READY & LIVE</span>
                 </div>
-                <h1 style="font-size: clamp(30px, 4vw, 42px); font-weight: 900; letter-spacing: -1px; margin-bottom: 6px;">
-                    KaifxWasi<span class="gradient-accent">-Mini</span>
+                <h1 style="font-size: clamp(28px, 4vw, 40px); font-weight: 900; letter-spacing: -1px; margin-bottom: 6px;">
+                    KaifxWasi<span class="gradient-accent">-Mini Platform</span>
                 </h1>
-                <p style="color: var(--text-muted); font-size: 15px;">
-                    Instant WhatsApp Bot Pairing & Cloud Automation
+                <p style="color: var(--text-muted); font-size: 14.5px;">
+                    Multi-Tenant Cloud WhatsApp Bot Pairing & Automation
                 </p>
             </div>
 
             <!-- THE PAIRING & QR PORTAL CARD -->
             <div class="hero-pairing-card">
+                
+                <!-- Cluster Server Node Bar (Visible on all devices & mobile) -->
+                <div class="cluster-node-bar">
+                    <div class="cluster-node-info">
+                        <span class="node-pill" id="nodeStatusPill">🟢 Node 1</span>
+                        <span class="node-url-text" id="activeServerText">backend-01-24b5dad12790.herokuapp.com</span>
+                        <span class="node-latency-text" id="activeServerPing"></span>
+                    </div>
+                    <button type="button" class="btn-change-server" onclick="openServerSettingsModal()">
+                        <i class="fa-solid fa-server"></i> Switch Node
+                    </button>
+                </div>
+
                 <!-- Connected State Screen -->
                 <div id="connectedScreen" class="connected-state-card">
                     <div class="connected-big-icon">
@@ -1251,48 +916,37 @@
                     </div>
                     <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 6px;">Bot Connected & Active!</h3>
                     <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;" id="connectedPhoneText">
-                        Your WhatsApp bot session is currently online and responding.
+                        Your WhatsApp bot session is currently online and running in memory.
                     </p>
-                    <button class="btn-ghost" style="color: var(--rose); border-color: rgba(244, 63, 94, 0.3); width: 100%; justify-content: center;" onclick="resetForm()">
+                    <button class="btn btn-ghost" style="color: var(--rose); border-color: rgba(244, 63, 94, 0.3); width: 100%;" onclick="resetForm()">
                         <i class="fa-solid fa-user-plus"></i> Pair Another Account
                     </button>
                 </div>
 
-                <!-- Pairing Input Screen -->
+                <!-- Pairing Form Area -->
                 <div id="pairingFormArea">
                     <!-- Tab Switcher -->
                     <div class="pairing-tabs">
                         <button class="pair-tab-btn active" id="tabPairBtn" onclick="switchTab('pair')">
-                            <i class="fa-solid fa-key"></i> Pairing Code
+                            <i class="fa-solid fa-key"></i> 8-Digit Pairing Code
                         </button>
                         <button class="pair-tab-btn" id="tabQrBtn" onclick="switchTab('qr')">
-                            <i class="fa-solid fa-qrcode"></i> QR Code
+                            <i class="fa-solid fa-qrcode"></i> QR Code Scan
                         </button>
                     </div>
 
                     <!-- Pairing Code Tab -->
                     <div class="pair-panel active" id="pairPanel">
-                        <!-- Mobile Server Switcher Bar -->
-                        <div style="background: rgba(255,255,255,0.04); border: 1px solid var(--border-glass); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
-                            <div style="display: flex; align-items: center; gap: 8px; overflow: hidden; flex: 1;">
-                                <span style="font-size: 11px; padding: 2px 8px; border-radius: 99px; background: rgba(16, 185, 129, 0.15); color: #10b981; font-weight: 700; flex-shrink: 0;">🟢 Cluster Node</span>
-                                <span id="activeServerText" style="font-size: 12px; font-family: monospace; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Connecting...</span>
-                            </div>
-                            <button type="button" onclick="openServerSettingsModal()" style="background: rgba(99, 102, 241, 0.15); border: 1px solid var(--border-glow); color: #818cf8; font-size: 12px; font-weight: 700; cursor: pointer; padding: 4px 10px; border-radius: 8px; flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px;">
-                                <i class="fa-solid fa-gear"></i> Change
-                            </button>
-                        </div>
-
                         <div class="input-box">
-                            <label class="input-label">WhatsApp Phone Number (With Country Code):</label>
+                            <label class="input-label">Enter WhatsApp Phone Number (With Country Code):</label>
                             <div class="phone-input-group">
                                 <i class="fa-solid fa-phone phone-icon"></i>
-                                <input type="text" id="phoneInput" class="custom-input" placeholder="e.g. 923453684061" />
+                                <input type="text" id="phoneInput" class="custom-input" placeholder="e.g. 923453684061" onkeypress="if(event.key==='Enter') generatePairingCode()" />
                             </div>
                         </div>
 
-                        <button class="btn-primary btn-full" id="getPairingCodeBtn" onclick="generatePairingCode()">
-                            <i class="fa-solid fa-paper-plane"></i> Generate Pairing Code
+                        <button class="btn btn-primary btn-full" id="getPairingCodeBtn" onclick="generatePairingCode()">
+                            <i class="fa-solid fa-paper-plane"></i> Get Pairing Code
                         </button>
 
                         <div id="codeDisplayArea" class="code-reveal-box">
@@ -1320,10 +974,10 @@
                             <div class="qr-frame" id="qrBoxContainer">
                                 <i class="fa-solid fa-qrcode fa-3x" style="color: var(--text-dim);"></i>
                             </div>
-                            <p style="color: var(--text-muted); font-size: 13.5px; margin-bottom: 16px;" id="qrInstructionText">
-                                Scan the QR code using your WhatsApp camera to connect.
+                            <p style="color: var(--text-muted); font-size: 13.5px; margin-bottom: 16px;">
+                                Scan this QR code using your WhatsApp camera to link.
                             </p>
-                            <button class="btn-ghost" onclick="refreshQR()">
+                            <button class="btn btn-ghost" onclick="refreshQR()">
                                 <i class="fa-solid fa-rotate-right"></i> Refresh QR Code
                             </button>
                         </div>
@@ -1333,388 +987,133 @@
         </div>
     </section>
 
-    <!-- Statistics Section -->
+    <!-- Stats Section -->
     <section class="stats-section">
         <div class="container stats-grid">
             <div class="stat-card">
-                <div class="stat-number gradient-text">20+</div>
-                <div class="stat-label">Core Automation Features</div>
+                <div class="stat-number gradient-accent">80+</div>
+                <div class="stat-label">Multi-Cluster Concurrency</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number gradient-accent">100+</div>
-                <div class="stat-label">Active Bot Commands</div>
+                <div class="stat-number gradient-text">100+</div>
+                <div class="stat-label">Bot Features & Plugins</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number gradient-accent">0ms</div>
+                <div class="stat-label">In-Memory Command Speed</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number gradient-text">99.9%</div>
-                <div class="stat-label">Reliable Message Delivery</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number gradient-accent">24/7</div>
-                <div class="stat-label">Non-Stop Cloud Hosting</div>
+                <div class="stat-label">Cloud Dyno Uptime</div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="features-section" id="features">
+    <!-- Commands Explorer Section -->
+    <section class="commands-section" id="commands">
         <div class="container">
             <div class="section-header">
-                <div class="section-tag">Features</div>
-                <h2 class="section-title">Built for Speed, Privacy & Power</h2>
-                <p class="section-subtitle">Discover all the incredible capabilities packed into the lightweight KaifxWasi-Mini core.</p>
+                <h2 class="section-title">Command & Plugin Showcase</h2>
+                <p class="section-desc">Explore our rich library of WhatsApp automation plugins ready to execute.</p>
             </div>
 
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon-wrapper" style="color: #6366f1;">
-                        <i class="fa-solid fa-bolt"></i>
-                    </div>
-                    <h3 class="feature-title">⚡ Fast Automation</h3>
-                    <p class="feature-desc">Sub-second command responses, auto-status viewers, and non-blocking background queue handlers.</p>
-                </div>
+            <div class="command-filters">
+                <button class="filter-chip active" onclick="filterCommands('all', this)">All Plugins</button>
+                <button class="filter-chip" onclick="filterCommands('media', this)">Media & Video</button>
+                <button class="filter-chip" onclick="filterCommands('group', this)">Group Guardian</button>
+                <button class="filter-chip" onclick="filterCommands('audio', this)">BGM & Audio</button>
+                <button class="filter-chip" onclick="filterCommands('ai', this)">AI & Utility</button>
+            </div>
 
-                <div class="feature-card">
-                    <div class="feature-icon-wrapper" style="color: #10b981;">
-                        <i class="fa-solid fa-shield-halved"></i>
-                    </div>
-                    <h3 class="feature-title">🛡️ Anti Delete</h3>
-                    <p class="feature-desc">Instantly recovers revoked/deleted messages and forwards them quietly to your private inbox.</p>
+            <div class="commands-grid" id="commandsGrid">
+                <!-- Media -->
+                <div class="cmd-card" data-category="media">
+                    <div class="cmd-name"><i class="fa-brands fa-youtube"></i> .video / .play</div>
+                    <div class="cmd-desc">High-speed YouTube video and audio streamer with multi-instance Invidious fallback.</div>
                 </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon-wrapper" style="color: #06b6d4;">
-                        <i class="fa-solid fa-eye"></i>
-                    </div>
-                    <h3 class="feature-title">👁️ View Once Recovery</h3>
-                    <p class="feature-desc">Automatically intercepts 1-time view photos, videos, and voice notes straight to your Sudo DM.</p>
+                <div class="cmd-card" data-category="media">
+                    <div class="cmd-name"><i class="fa-brands fa-instagram"></i> .ig / .instagram</div>
+                    <div class="cmd-desc">Instant Instagram reels and post video downloader.</div>
                 </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon-wrapper" style="color: #f59e0b;">
-                        <i class="fa-solid fa-circle-dot"></i>
-                    </div>
-                    <h3 class="feature-title">📱 Auto & Ring Status</h3>
-                    <p class="feature-desc">Auto read/react to WhatsApp statuses and broadcast official green status rings to group icons.</p>
+                <!-- Group -->
+                <div class="cmd-card" data-category="group">
+                    <div class="cmd-name"><i class="fa-solid fa-bullhorn"></i> .tagall / .mention</div>
+                    <div class="cmd-desc">Admin mass announcement tagger with custom audio replies and emojis.</div>
                 </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon-wrapper" style="color: #8b5cf6;">
-                        <i class="fa-solid fa-brain"></i>
-                    </div>
-                    <h3 class="feature-title">🤖 AI Commands</h3>
-                    <p class="feature-desc">Powered by Google Gemini for intelligent conversations, coding help, and language translations.</p>
+                <div class="cmd-card" data-category="group">
+                    <div class="cmd-name"><i class="fa-solid fa-shield-virus"></i> .antilink / .antibot</div>
+                    <div class="cmd-desc">Automated group spam shield that detects and removes malicious links and rogue bots.</div>
                 </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon-wrapper" style="color: #f43f5e;">
-                        <i class="fa-solid fa-link-slash"></i>
-                    </div>
-                    <h3 class="feature-title">🔗 Anti Link & Bot</h3>
-                    <p class="feature-desc">Automated group moderation that kicks external spammers, malicious link posters, and competitor bots.</p>
+                <!-- Audio -->
+                <div class="cmd-card" data-category="audio">
+                    <div class="cmd-name"><i class="fa-solid fa-music"></i> .bgm add &lt;trigger&gt;</div>
+                    <div class="cmd-desc">Custom keyword-triggered background voice notes with Catbox/Uguu CDN fallbacks.</div>
                 </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon-wrapper" style="color: #38bdf8;">
-                        <i class="fa-solid fa-cloud-arrow-down"></i>
-                    </div>
-                    <h3 class="feature-title">📥 Auto Downloaders</h3>
-                    <p class="feature-desc">High-speed media extraction for YouTube, TikTok, Instagram, Pinterest, Facebook, and CapCut.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon-wrapper" style="color: #ec4899;">
-                        <i class="fa-solid fa-music"></i>
-                    </div>
-                    <h3 class="feature-title">🎵 Media Tools</h3>
-                    <p class="feature-desc">Generate high-res level rank cards, voice notes, sticker conversions, and fancy styled typography.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon-wrapper" style="color: #eab308;">
-                        <i class="fa-solid fa-sliders"></i>
-                    </div>
-                    <h3 class="feature-title">⚙️ Custom Commands</h3>
-                    <p class="feature-desc">Easily toggle features on/off globally or per-group with simple `.toggle` control panels.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon-wrapper" style="color: #a855f7;">
-                        <i class="fa-solid fa-rocket"></i>
-                    </div>
-                    <h3 class="feature-title">🚀 50-Pair Deployment</h3>
-                    <p class="feature-desc">Optimized RAM architecture capable of hosting up to 50 simultaneous user sessions on a single instance.</p>
+                <!-- AI -->
+                <div class="cmd-card" data-category="ai">
+                    <div class="cmd-name"><i class="fa-solid fa-wand-magic-sparkles"></i> .ai / .gpt</div>
+                    <div class="cmd-desc">Direct intelligent conversational responses powered by Gemini & GPT models.</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Command Preview Terminal -->
-    <section class="terminal-section" id="commands">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-tag">Interactive Terminal</div>
-                <h2 class="section-title">Clean & Responsive Commands</h2>
-                <p class="section-subtitle">Over 100+ commands designed for effortless WhatsApp control.</p>
+    <!-- Multi-Server Cluster Switcher Modal -->
+    <div id="backendSettingsModal" class="modal-overlay">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeServerSettingsModal()">&times;</button>
+            <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 6px; color: white;">
+                <i class="fa-solid fa-server" style="color: var(--primary);"></i> Server Cluster Nodes
+            </h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+                Select a server node or add a new backend instance.
+            </p>
+
+            <div style="margin-bottom: 16px;">
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 6px;">
+                    Select Saved Server Node:
+                </label>
+                <select id="modalServerDropdown" class="custom-input" style="padding: 12px; font-size: 13px; font-family: monospace;" onchange="onModalServerSelect(this.value)">
+                    <!-- Populated dynamically -->
+                </select>
             </div>
 
-            <div class="terminal-box">
-                <div class="terminal-bar">
-                    <div class="terminal-dots">
-                        <div class="dot dot-red"></div>
-                        <div class="dot dot-yellow"></div>
-                        <div class="dot dot-green"></div>
-                    </div>
-                    <div class="terminal-title">wasi-md-v7@terminal ~</div>
-                    <div></div>
-                </div>
-
-                <div class="terminal-body" id="terminalText">
-                    <span class="term-prompt">user@wasi-md:~$</span> <span id="typewriterText"></span><span class="cursor-blink"></span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Technology Section -->
-    <section class="tech-section">
-        <div class="container">
-            <div class="section-header" style="margin-bottom: 36px;">
-                <div class="section-tag">Technology Stack</div>
-                <h2 class="section-title">Built on Modern Open Technologies</h2>
+            <div style="margin-bottom: 20px;">
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 6px;">
+                    Or Enter Custom Heroku Backend URL:
+                </label>
+                <input type="text" id="customBackendUrlInput" class="custom-input" style="padding: 12px; font-size: 13px; font-family: monospace;" placeholder="https://your-backend.herokuapp.com" />
             </div>
 
-            <div class="tech-grid">
-                <div class="tech-badge">
-                    <i class="fa-brands fa-node-js" style="color: #22c55e;"></i>
-                    <span>Node.js v20+</span>
-                </div>
-                <div class="tech-badge">
-                    <i class="fa-brands fa-whatsapp" style="color: #10b981;"></i>
-                    <span>Baileys Socket v7</span>
-                </div>
-                <div class="tech-badge">
-                    <i class="fa-solid fa-database" style="color: #06b6d4;"></i>
-                    <span>MongoDB Atlas</span>
-                </div>
-                <div class="tech-badge">
-                    <i class="fa-solid fa-server" style="color: #6366f1;"></i>
-                    <span>Express.js REST</span>
-                </div>
-                <div class="tech-badge">
-                    <i class="fa-solid fa-wand-magic-sparkles" style="color: #a855f7;"></i>
-                    <span>Sharp & SVG Engine</span>
-                </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" style="flex: 1;" onclick="saveCustomBackendUrl()">
+                    <i class="fa-solid fa-floppy-disk"></i> Connect & Save
+                </button>
+                <button class="btn btn-ghost" onclick="promptAddModalServer()">
+                    <i class="fa-solid fa-plus"></i> Add Node
+                </button>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- FAQ Section -->
-    <section class="faq-section" id="faq">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-tag">Frequently Asked</div>
-                <h2 class="section-title">Common Questions & Answers</h2>
-                <p class="section-subtitle">Everything you need to know about using and pairing KaifxWasi-Mini (WASI-MD-V7).</p>
-            </div>
-
-            <div class="faq-grid">
-                <div class="faq-item active">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>What is KaifxWasi-Mini?</span>
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        KaifxWasi-Mini (WASI-MD-V7) is a lightweight, multi-tenant WhatsApp userbot designed for speed, group moderation, media downloads, AI conversations, anti-delete, and group ring statuses.
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>How do I pair my WhatsApp account?</span>
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        Simply enter your phone number with your country code in the Pairing Portal right at the top of this page, click <strong>Generate Pairing Code</strong>, and enter the 8-digit code inside your WhatsApp <strong>Linked Devices</strong> menu.
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>Is KaifxWasi-Mini free to use?</span>
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        Yes! KaifxWasi-Mini is open-source and free to deploy on Heroku, Koyeb, Render, VPS, or your local machine.
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>Can multiple users connect to one deployment?</span>
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        Yes! The bot supports up to 50 concurrent paired WhatsApp accounts on a single Heroku dyno without crashing or exceeding RAM limits.
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>Where do recovered ViewOnce and Anti-Delete files go?</span>
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        All single-view media and deleted messages are privately delivered straight to your own connected WhatsApp number's inbox (Message Yourself) with zero public notifications.
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Final CTA Section -->
-    <section class="cta-section">
-        <div class="container">
-            <div class="cta-box">
-                <h2>Ready to Automate Your WhatsApp?</h2>
-                <p>Connect your account today and experience the speed, power, and security of KaifxWasi-Mini.</p>
-                <a href="#hero" class="btn-primary" style="padding: 18px 36px; font-size: 17px;">
-                    <i class="fa-solid fa-arrow-up"></i> Pair Your WhatsApp Now
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <a href="#" class="brand-logo">
-                        <div class="brand-icon-box" style="width: 36px; height: 36px; font-size: 16px;">
-                            <i class="fa-solid fa-robot"></i>
-                        </div>
-                        <span>KaifxWasi<span class="gradient-accent">-Mini</span></span>
-                    </a>
-                    <p>Powerful WhatsApp automation for everyone. Built with passion by Kaif & Wasi.</p>
-                </div>
-
-                <div class="footer-col">
-                    <h4>Navigation</h4>
-                    <ul>
-                        <li><a href="#hero">Home</a></li>
-                        <li><a href="#features">Features</a></li>
-                        <li><a href="#hero">Pairing Portal</a></li>
-                        <li><a href="#commands">Commands</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-col">
-                    <h4>Developers</h4>
-                    <ul>
-                        <li><a href="https://wa.me/+923453684061" target="_blank"><i class="fa-brands fa-whatsapp"></i> Kaif (+923453684061)</a></li>
-                        <li><a href="https://wa.me/+263788049675" target="_blank"><i class="fa-brands fa-whatsapp"></i> Wasi (+263788049675)</a></li>
-                        <li><a href="https://whatsapp.com/channel/0029VandflVIt5rojK8k0O2M" target="_blank"><i class="fa-solid fa-bullhorn"></i> Official Channel</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-col">
-                    <h4>Open Source</h4>
-                    <ul>
-                        <li><a href="https://github.com/Itxxwasi/WASI-MD-V7" target="_blank"><i class="fa-brands fa-github"></i> WASI-MD-V7 Repo</a></li>
-                        <li><a href="https://github.com/Itxxwasi/WASI-MD-V7/issues" target="_blank"><i class="fa-solid fa-bug"></i> Report Issue</a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="footer-bottom">
-                <p>© 2026 WASI-MD-V7 / KaifxWasi-Mini. All rights reserved.</p>
-                <p>Designed with <i class="fa-solid fa-heart" style="color: var(--rose);"></i> by <strong style="color: white;">Kaif x Chaudhary</strong></p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Interactive JavaScript Logic -->
+    <!-- JavaScript Application Logic -->
     <script>
-        // Navbar Scroll Blur Effect
-        window.addEventListener('scroll', () => {
-            const navbar = document.getElementById('navbar');
-            if (window.scrollY > 40) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-
-        // Mobile Menu Drawer Toggle
-        function toggleMobileMenu() {
-            const drawer = document.getElementById('mobileDrawer');
-            drawer.classList.toggle('open');
-        }
-
-        // FAQ Accordion
-        function toggleFaq(el) {
-            const item = el.parentElement;
-            item.classList.toggle('active');
-        }
-
-        // Toast Notification System
-        function showToast(message, isSuccess = true) {
-            const toast = document.getElementById('toast');
-            const msg = document.getElementById('toastMsg');
-            msg.innerText = message;
-            toast.style.borderColor = isSuccess ? 'var(--emerald)' : 'var(--rose)';
-            toast.style.display = 'flex';
-            setTimeout(() => { toast.style.display = 'none'; }, 3500);
-        }
-
-        // Animated Terminal Typewriter
-        const terminalCommands = [
-            "WASI-MD-V7 SYSTEM ONLINE",
-            "Loading 100+ bot plugins...",
-            ".ping (Check latency: 0.12ms)",
-            ".menu (Display complete command catalog)",
-            ".status (View system & uptime stats)",
-            ".vv (Recover ViewOnce photos & videos)",
-            ".play shape of you (Download 320kbps audio)",
-            ".gemini explain quantum computing (AI Chat)",
-            ".groupstatus (Broadcast group green status ring)",
-            ".antilink on (Activate group protection)"
-        ];
-
-        let termIdx = 0;
-        let charIdx = 0;
-        let isDeleting = false;
-        const typeElem = document.getElementById('typewriterText');
-
-        function typeLoop() {
-            const current = terminalCommands[termIdx];
-            if (isDeleting) {
-                typeElem.innerText = current.substring(0, charIdx - 1);
-                charIdx--;
-            } else {
-                typeElem.innerText = current.substring(0, charIdx + 1);
-                charIdx++;
-            }
-
-            let delay = isDeleting ? 30 : 60;
-
-            if (!isDeleting && charIdx === current.length) {
-                delay = 2000;
-                isDeleting = true;
-            } else if (isDeleting && charIdx === 0) {
-                isDeleting = false;
-                termIdx = (termIdx + 1) % terminalCommands.length;
-                delay = 500;
-            }
-
-            setTimeout(typeLoop, delay);
-        }
-        typeLoop();
-
-        // -------------------------------------------------------------
-        // PAIRING API INTEGRATION (Multi-Server & Vercel Compatible)
-        // -------------------------------------------------------------
         const PRIMARY_DEFAULT_BACKEND = 'https://backend-01-24b5dad12790.herokuapp.com';
+
+        function getSavedServersList() {
+            try {
+                const raw = localStorage.getItem('kaif_saved_servers');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                }
+            } catch (e) {}
+            return [{ name: 'Server 1 (Primary)', url: PRIMARY_DEFAULT_BACKEND }];
+        }
+
+        function saveServersList(servers) {
+            localStorage.setItem('kaif_saved_servers', JSON.stringify(servers));
+        }
 
         function getFrontendBackendUrl() {
             const params = new URLSearchParams(window.location.search);
@@ -1723,18 +1122,29 @@
 
             let url = localStorage.getItem('kaif_backend_url') || localStorage.getItem('backend_url');
             if (!url) {
-                try {
-                    const raw = localStorage.getItem('kaif_saved_servers');
-                    if (raw) {
-                        const parsed = JSON.parse(raw);
-                        if (Array.isArray(parsed) && parsed.length > 0) url = parsed[0].url;
-                    }
-                } catch (e) {}
-            }
-            if (!url && window.location.hostname !== 'localhost' && !window.location.hostname.includes('vercel.app')) {
-                url = window.location.origin;
+                const servers = getSavedServersList();
+                url = servers[0]?.url || PRIMARY_DEFAULT_BACKEND;
             }
             return (url || PRIMARY_DEFAULT_BACKEND).replace(/\/+$/, '');
+        }
+
+        function setFrontendBackendUrl(url, name = null) {
+            let clean = String(url || '').trim().replace(/\/+$/, '');
+            if (clean && !clean.startsWith('http://') && !clean.startsWith('https://')) {
+                clean = 'https://' + clean;
+            }
+            if (clean) {
+                localStorage.setItem('kaif_backend_url', clean);
+                localStorage.setItem('backend_url', clean);
+
+                const servers = getSavedServersList();
+                if (!servers.some(s => s.url.toLowerCase() === clean.toLowerCase())) {
+                    servers.push({ name: name || `Server ${servers.length + 1}`, url: clean });
+                    saveServersList(servers);
+                }
+            }
+            updateActiveServerUI();
+            return clean || getFrontendBackendUrl();
         }
 
         function updateActiveServerUI() {
@@ -1742,14 +1152,28 @@
             const textEl = document.getElementById('activeServerText');
             if (textEl) {
                 try {
-                    const host = new URL(current).hostname;
-                    textEl.innerText = host;
+                    textEl.innerText = new URL(current).hostname;
                 } catch (e) {
-                    textEl.innerText = current || 'No backend connected';
+                    textEl.innerText = current || PRIMARY_DEFAULT_BACKEND;
                 }
             }
+            testServerPing(current);
         }
-        updateActiveServerUI();
+
+        async function testServerPing(url) {
+            const pingEl = document.getElementById('activeServerPing');
+            if (!pingEl || !url) return;
+            try {
+                const t0 = Date.now();
+                await fetch(`${url}/ping`, { method: 'GET', signal: AbortSignal.timeout(4000) });
+                const lat = Date.now() - t0;
+                pingEl.innerText = `(${lat}ms)`;
+                pingEl.style.color = '#34d399';
+            } catch (e) {
+                pingEl.innerText = `(Awake...)`;
+                pingEl.style.color = '#f59e0b';
+            }
+        }
 
         function apiFetch(endpoint, options = {}) {
             const base = getFrontendBackendUrl();
@@ -1760,6 +1184,16 @@
         let currentSessionId = sessionStorage.getItem('user_bot_session_id') || null;
         let activeTab = 'pair';
         let pollTimer = null;
+
+        function showToast(msg, isSuccess = true) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            if (!toast || !toastMsg) return;
+            toastMsg.innerText = msg;
+            toast.style.borderColor = isSuccess ? '#10b981' : '#ef4444';
+            toast.style.display = 'flex';
+            setTimeout(() => { toast.style.display = 'none'; }, 4000);
+        }
 
         function switchTab(tab) {
             activeTab = tab;
@@ -1779,37 +1213,21 @@
                 const data = await res.json();
                 const text = document.getElementById('heroCapacity');
                 if (text && data.activeCount !== undefined) {
-                    text.innerText = `${data.activeCount} / ${data.maxSessions} Active`;
+                    text.innerText = `CLUSTER: ${data.activeCount} / ${data.maxSessions || 20} Active`;
                 }
             } catch (e) {}
-        }
-
-        function getSavedServersList() {
-            try {
-                const raw = localStorage.getItem('kaif_saved_servers');
-                if (raw) {
-                    const parsed = JSON.parse(raw);
-                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-                }
-            } catch (e) {}
-            return [];
         }
 
         async function createSessionWithAutoFailover(cleanPhone, sessionId) {
             const servers = getSavedServersList();
             const current = getFrontendBackendUrl();
             
-            // Re-order servers so current is tried first, followed by others
             const serverQueue = [];
             if (current) serverQueue.push(current);
             servers.forEach(s => {
-                const url = s.url.replace(/\/+$/, '');
-                if (!serverQueue.includes(url)) serverQueue.push(url);
+                const u = s.url.replace(/\/+$/, '');
+                if (!serverQueue.includes(u)) serverQueue.push(u);
             });
-
-            if (serverQueue.length === 0) {
-                throw new Error('No backend servers configured. Please add a backend server.');
-            }
 
             let lastError = null;
 
@@ -1823,32 +1241,28 @@
                     });
 
                     const data = await res.json().catch(() => ({}));
-
-                    // Check if server is full or hit capacity limit
                     const isFull = (res.status === 429 || res.status === 503 || (data.error && data.error.toLowerCase().includes('limit reached')) || (data.error && data.error.toLowerCase().includes('max_sessions')));
 
                     if (!isFull && data.success && (data.pairingCode || data.code)) {
                         if (targetServer !== current) {
-                            localStorage.setItem('kaif_backend_url', targetServer);
-                            showToast(`⚡ Switched to ${targetServer.replace(/^https?:\/\//, '').slice(0, 20)}... (Previous server was full)`, true);
+                            setFrontendBackendUrl(targetServer);
+                            showToast(`⚡ Auto-routed to ${new URL(targetServer).hostname} (Previous server was full)`, true);
                         }
                         return { data, serverUrl: targetServer };
                     }
 
                     if (isFull) {
-                        console.warn(`[Load Balancer] Server ${targetServer} is full. Checking next server...`);
-                        lastError = data.error || 'Server at max capacity (20/20). Auto-switching...';
-                        continue; // Try next server in cluster!
+                        lastError = 'Current node full. Auto-routing...';
+                        continue;
                     }
 
                     return { data, serverUrl: targetServer };
                 } catch (e) {
-                    console.warn(`[Load Balancer] Failed to reach ${targetServer}:`, e.message);
                     lastError = e.message;
                 }
             }
 
-            throw new Error(lastError || 'All configured servers are currently full or unreachable.');
+            throw new Error(lastError || 'All servers currently full. Please try again in 1 minute.');
         }
 
         async function generatePairingCode() {
@@ -1865,14 +1279,14 @@
 
             const btn = document.getElementById('getPairingCodeBtn');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Finding Server & Pairing...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating Code...';
 
             try {
                 const result = await createSessionWithAutoFailover(cleanPhone, currentSessionId);
                 const data = result.data;
                 
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Generate Pairing Code';
+                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Get Pairing Code';
 
                 if (data.success && (data.pairingCode || data.code)) {
                     const code = data.pairingCode || data.code;
@@ -1887,7 +1301,7 @@
                 }
             } catch (e) {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Generate Pairing Code';
+                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Get Pairing Code';
                 showToast(`❌ ${e.message}`, false);
             }
         }
@@ -1921,20 +1335,19 @@
 
         async function pollStatus() {
             if (!currentSessionId) return;
-
             try {
                 const res = await apiFetch(`/api/status?sessionId=${encodeURIComponent(currentSessionId)}`);
                 const data = await res.json();
 
                 if (data.connected) {
-                    if (pollTimer) clearInterval(pollTimer);
+                    clearInterval(pollTimer);
+                    pollTimer = null;
                     document.getElementById('pairingFormArea').style.display = 'none';
                     document.getElementById('connectedScreen').style.display = 'block';
-                    document.getElementById('connectedPhoneText').innerText = `Bot session [${currentSessionId}] is fully online and active on WhatsApp!`;
-                    showToast('🎉 WhatsApp session paired successfully!', true);
+                    document.getElementById('connectedPhoneText').innerText = `WhatsApp account connected successfully on session: ${currentSessionId}`;
+                    showToast('🎉 Bot Connected & Online!', true);
                 } else if (data.qr && activeTab === 'qr') {
-                    const qrBox = document.getElementById('qrBoxContainer');
-                    qrBox.innerHTML = `<img src="${data.qr}" alt="QR Code" style="width: 230px; height: 230px; border-radius: 14px;">`;
+                    document.getElementById('qrBoxContainer').innerHTML = `<img src="${data.qr}" alt="QR" style="width:100%; height:100%; object-fit:contain; border-radius:12px;" />`;
                 }
             } catch (e) {}
         }
@@ -1956,12 +1369,24 @@
             document.getElementById('phoneInput').value = '';
         }
 
-        // -------------------------------------------------------------
-        // BACKEND SERVER SETTINGS MODAL (Switch Heroku URLs Anytime)
-        // -------------------------------------------------------------
+        /* Modal Server Functions */
+        function populateModalServerDropdown() {
+            const servers = getSavedServersList();
+            const current = getFrontendBackendUrl().toLowerCase();
+            const select = document.getElementById('modalServerDropdown');
+            if (!select) return;
+
+            let html = '';
+            servers.forEach(s => {
+                const isSelected = s.url.toLowerCase() === current;
+                html += `<option value="${s.url}" ${isSelected ? 'selected' : ''}>🌐 ${s.name} (${s.url.replace(/^https?:\/\//, '').slice(0, 26)}...)</option>`;
+            });
+            select.innerHTML = html;
+            document.getElementById('customBackendUrlInput').value = getFrontendBackendUrl();
+        }
+
         function openServerSettingsModal() {
-            const current = getFrontendBackendUrl();
-            document.getElementById('customBackendUrlInput').value = current;
+            populateModalServerDropdown();
             document.getElementById('backendSettingsModal').style.display = 'flex';
         }
 
@@ -1969,38 +1394,50 @@
             document.getElementById('backendSettingsModal').style.display = 'none';
         }
 
+        function onModalServerSelect(val) {
+            document.getElementById('customBackendUrlInput').value = val;
+        }
+
         function saveCustomBackendUrl() {
-            const val = (document.getElementById('customBackendUrlInput').value || '').trim();
-            if (val) {
-                let cleaned = val.replace(/\/+$/, '');
-                if (!cleaned.startsWith('http://') && !cleaned.startsWith('https://')) {
-                    cleaned = 'https://' + cleaned;
-                }
-                localStorage.setItem('kaif_backend_url', cleaned);
-                showToast('✅ Backend URL updated to: ' + cleaned, true);
-            } else {
-                localStorage.removeItem('kaif_backend_url');
-                showToast('Cleared custom backend URL', true);
-            }
+            const val = document.getElementById('customBackendUrlInput').value;
+            setFrontendBackendUrl(val);
             closeServerSettingsModal();
-            setTimeout(() => window.location.reload(), 800);
+            showToast('✅ Server Node connected successfully!', true);
+            fetchGlobalCapacity();
         }
 
-        // Display current active backend name
-        const activeUrl = getFrontendBackendUrl();
-        if (activeUrl) {
-            try {
-                const host = new URL(activeUrl).hostname.split('.')[0];
-                const pill = document.getElementById('backendStatusPill');
-                if (pill) pill.innerText = `API: ${host}`;
-            } catch (e) {}
+        function promptAddModalServer() {
+            const name = prompt('Enter a friendly name (e.g. "Server 2 Heroku"):');
+            if (!name) return;
+            const url = prompt('Enter Backend URL (e.g. "https://my-backend-2.herokuapp.com"):');
+            if (!url) return;
+
+            setFrontendBackendUrl(url, name.trim());
+            populateModalServerDropdown();
+            showToast(`✅ Added & connected to [${name}]: ${url}`, true);
         }
 
+        function filterCommands(cat, btn) {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+
+            const cards = document.querySelectorAll('.cmd-card');
+            cards.forEach(card => {
+                if (cat === 'all' || card.getAttribute('data-category') === cat) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Initialize UI
+        updateActiveServerUI();
         fetchGlobalCapacity();
-        setInterval(fetchGlobalCapacity, 5000);
+        setInterval(fetchGlobalCapacity, 6000);
 
         if (currentSessionId) {
-            pollStatus();
+            startStatusPolling();
         }
     </script>
 </body>
