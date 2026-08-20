@@ -897,16 +897,15 @@
             <!-- THE PAIRING & QR PORTAL CARD -->
             <div class="hero-pairing-card">
                 
-                <!-- Cluster Server Node Bar (Visible on all devices & mobile) -->
+                <!-- Cluster Server Selection Bar (Safe & Clean - No URLs exposed to public) -->
                 <div class="cluster-node-bar">
                     <div class="cluster-node-info">
-                        <span class="node-pill" id="nodeStatusPill">🟢 Node 1</span>
-                        <span class="node-url-text" id="activeServerText">backend-01-24b5dad12790.herokuapp.com</span>
+                        <span class="node-pill" id="nodeStatusPill">🟢 Live</span>
+                        <select id="publicServerSelect" style="background: transparent; border: none; color: white; font-weight: 700; font-size: 13.5px; outline: none; cursor: pointer; flex: 1;" onchange="onPublicServerChange(this.value)">
+                            <!-- Populated dynamically with friendly names only -->
+                        </select>
                         <span class="node-latency-text" id="activeServerPing"></span>
                     </div>
-                    <button type="button" class="btn-change-server" onclick="openServerSettingsModal()">
-                        <i class="fa-solid fa-server"></i> Switch Node
-                    </button>
                 </div>
 
                 <!-- Connected State Screen -->
@@ -1058,44 +1057,6 @@
         </div>
     </section>
 
-    <!-- Multi-Server Cluster Switcher Modal -->
-    <div id="backendSettingsModal" class="modal-overlay">
-        <div class="modal-card">
-            <button class="modal-close" onclick="closeServerSettingsModal()">&times;</button>
-            <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 6px; color: white;">
-                <i class="fa-solid fa-server" style="color: var(--primary);"></i> Server Cluster Nodes
-            </h3>
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
-                Select a server node or add a new backend instance.
-            </p>
-
-            <div style="margin-bottom: 16px;">
-                <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 6px;">
-                    Select Saved Server Node:
-                </label>
-                <select id="modalServerDropdown" class="custom-input" style="padding: 12px; font-size: 13px; font-family: monospace;" onchange="onModalServerSelect(this.value)">
-                    <!-- Populated dynamically -->
-                </select>
-            </div>
-
-            <div style="margin-bottom: 20px;">
-                <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 6px;">
-                    Or Enter Custom Heroku Backend URL:
-                </label>
-                <input type="text" id="customBackendUrlInput" class="custom-input" style="padding: 12px; font-size: 13px; font-family: monospace;" placeholder="https://your-backend.herokuapp.com" />
-            </div>
-
-            <div style="display: flex; gap: 10px;">
-                <button class="btn btn-primary" style="flex: 1;" onclick="saveCustomBackendUrl()">
-                    <i class="fa-solid fa-floppy-disk"></i> Connect & Save
-                </button>
-                <button class="btn btn-ghost" onclick="promptAddModalServer()">
-                    <i class="fa-solid fa-plus"></i> Add Node
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- JavaScript Application Logic -->
     <script>
         const PRIMARY_DEFAULT_BACKEND = 'https://backend-01-24b5dad12790.herokuapp.com';
@@ -1108,7 +1069,7 @@
                     if (Array.isArray(parsed) && parsed.length > 0) return parsed;
                 }
             } catch (e) {}
-            return [{ name: 'Server 1 (Primary)', url: PRIMARY_DEFAULT_BACKEND }];
+            return [{ name: 'Server 1 (Primary High-Speed)', url: PRIMARY_DEFAULT_BACKEND }];
         }
 
         function saveServersList(servers) {
@@ -1143,21 +1104,34 @@
                     saveServersList(servers);
                 }
             }
-            updateActiveServerUI();
+            populatePublicServerDropdown();
             return clean || getFrontendBackendUrl();
         }
 
-        function updateActiveServerUI() {
-            const current = getFrontendBackendUrl();
-            const textEl = document.getElementById('activeServerText');
-            if (textEl) {
-                try {
-                    textEl.innerText = new URL(current).hostname;
-                } catch (e) {
-                    textEl.innerText = current || PRIMARY_DEFAULT_BACKEND;
-                }
+        function populatePublicServerDropdown() {
+            const servers = getSavedServersList();
+            const current = getFrontendBackendUrl().toLowerCase();
+            const select = document.getElementById('publicServerSelect');
+            if (!select) return;
+
+            let html = '';
+            servers.forEach(s => {
+                const isSelected = s.url.toLowerCase() === current;
+                html += `<option value="${s.url}" ${isSelected ? 'selected' : ''} style="background: #0f172a; color: white;">🌐 ${s.name}</option>`;
+            });
+            select.innerHTML = html;
+            testServerPing(getFrontendBackendUrl());
+        }
+
+        function onPublicServerChange(val) {
+            if (val) {
+                localStorage.setItem('kaif_backend_url', val);
+                localStorage.setItem('backend_url', val);
+                testServerPing(val);
+                fetchGlobalCapacity();
+                const selName = document.getElementById('publicServerSelect')?.selectedOptions[0]?.text || 'server node';
+                showToast(`✅ Connected to ${selName}`, true);
             }
-            testServerPing(current);
         }
 
         async function testServerPing(url) {
@@ -1245,14 +1219,17 @@
 
                     if (!isFull && data.success && (data.pairingCode || data.code)) {
                         if (targetServer !== current) {
-                            setFrontendBackendUrl(targetServer);
-                            showToast(`⚡ Auto-routed to ${new URL(targetServer).hostname} (Previous server was full)`, true);
+                            localStorage.setItem('kaif_backend_url', targetServer);
+                            localStorage.setItem('backend_url', targetServer);
+                            populatePublicServerDropdown();
+                            const serverObj = servers.find(s => s.url.toLowerCase() === targetServer.toLowerCase());
+                            showToast(`⚡ Auto-routed to ${serverObj ? serverObj.name : 'Backup Node'} (Previous node was full)`, true);
                         }
                         return { data, serverUrl: targetServer };
                     }
 
                     if (isFull) {
-                        lastError = 'Current node full. Auto-routing...';
+                        lastError = 'Current server node full. Auto-routing to backup...';
                         continue;
                     }
 
@@ -1262,7 +1239,7 @@
                 }
             }
 
-            throw new Error(lastError || 'All servers currently full. Please try again in 1 minute.');
+            throw new Error(lastError || 'All server nodes currently full. Please try again in 1 minute.');
         }
 
         async function generatePairingCode() {
@@ -1279,7 +1256,7 @@
 
             const btn = document.getElementById('getPairingCodeBtn');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating Code...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Finding Node & Pairing...';
 
             try {
                 const result = await createSessionWithAutoFailover(cleanPhone, currentSessionId);
@@ -1369,54 +1346,6 @@
             document.getElementById('phoneInput').value = '';
         }
 
-        /* Modal Server Functions */
-        function populateModalServerDropdown() {
-            const servers = getSavedServersList();
-            const current = getFrontendBackendUrl().toLowerCase();
-            const select = document.getElementById('modalServerDropdown');
-            if (!select) return;
-
-            let html = '';
-            servers.forEach(s => {
-                const isSelected = s.url.toLowerCase() === current;
-                html += `<option value="${s.url}" ${isSelected ? 'selected' : ''}>🌐 ${s.name} (${s.url.replace(/^https?:\/\//, '').slice(0, 26)}...)</option>`;
-            });
-            select.innerHTML = html;
-            document.getElementById('customBackendUrlInput').value = getFrontendBackendUrl();
-        }
-
-        function openServerSettingsModal() {
-            populateModalServerDropdown();
-            document.getElementById('backendSettingsModal').style.display = 'flex';
-        }
-
-        function closeServerSettingsModal() {
-            document.getElementById('backendSettingsModal').style.display = 'none';
-        }
-
-        function onModalServerSelect(val) {
-            document.getElementById('customBackendUrlInput').value = val;
-        }
-
-        function saveCustomBackendUrl() {
-            const val = document.getElementById('customBackendUrlInput').value;
-            setFrontendBackendUrl(val);
-            closeServerSettingsModal();
-            showToast('✅ Server Node connected successfully!', true);
-            fetchGlobalCapacity();
-        }
-
-        function promptAddModalServer() {
-            const name = prompt('Enter a friendly name (e.g. "Server 2 Heroku"):');
-            if (!name) return;
-            const url = prompt('Enter Backend URL (e.g. "https://my-backend-2.herokuapp.com"):');
-            if (!url) return;
-
-            setFrontendBackendUrl(url, name.trim());
-            populateModalServerDropdown();
-            showToast(`✅ Added & connected to [${name}]: ${url}`, true);
-        }
-
         function filterCommands(cat, btn) {
             document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
             btn.classList.add('active');
@@ -1432,7 +1361,7 @@
         }
 
         // Initialize UI
-        updateActiveServerUI();
+        populatePublicServerDropdown();
         fetchGlobalCapacity();
         setInterval(fetchGlobalCapacity, 6000);
 
