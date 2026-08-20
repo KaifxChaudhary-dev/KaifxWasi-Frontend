@@ -473,7 +473,10 @@
     </div>
 
     <script>
-        const DEFAULT_SERVERS = [];
+        const PRIMARY_DEFAULT_BACKEND = 'https://backend-01-24b5dad12790.herokuapp.com';
+        const DEFAULT_SERVERS = [
+            { name: 'Server 1 (Primary)', url: PRIMARY_DEFAULT_BACKEND }
+        ];
 
         function getSavedServers() {
             try {
@@ -483,7 +486,7 @@
                     if (Array.isArray(parsed) && parsed.length > 0) return parsed;
                 }
             } catch (e) {}
-            return [];
+            return [...DEFAULT_SERVERS];
         }
 
         function saveServersList(servers) {
@@ -498,12 +501,12 @@
             let url = localStorage.getItem('kaif_backend_url') || localStorage.getItem('backend_url');
             if (!url) {
                 const servers = getSavedServers();
-                url = servers[0]?.url || '';
+                url = servers[0]?.url || PRIMARY_DEFAULT_BACKEND;
             }
             if (!url && window.location.hostname !== 'localhost' && !window.location.hostname.includes('vercel.app')) {
                 url = window.location.origin;
             }
-            return (url || '').replace(/\/+$/, '');
+            return (url || PRIMARY_DEFAULT_BACKEND).replace(/\/+$/, '');
         }
 
         function setBackendUrl(url, serverName = null) {

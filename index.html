@@ -1272,6 +1272,17 @@
 
                     <!-- Pairing Code Tab -->
                     <div class="pair-panel active" id="pairPanel">
+                        <!-- Mobile Server Switcher Bar -->
+                        <div style="background: rgba(255,255,255,0.04); border: 1px solid var(--border-glass); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                            <div style="display: flex; align-items: center; gap: 8px; overflow: hidden; flex: 1;">
+                                <span style="font-size: 11px; padding: 2px 8px; border-radius: 99px; background: rgba(16, 185, 129, 0.15); color: #10b981; font-weight: 700; flex-shrink: 0;">🟢 Cluster Node</span>
+                                <span id="activeServerText" style="font-size: 12px; font-family: monospace; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Connecting...</span>
+                            </div>
+                            <button type="button" onclick="openServerSettingsModal()" style="background: rgba(99, 102, 241, 0.15); border: 1px solid var(--border-glow); color: #818cf8; font-size: 12px; font-weight: 700; cursor: pointer; padding: 4px 10px; border-radius: 8px; flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px;">
+                                <i class="fa-solid fa-gear"></i> Change
+                            </button>
+                        </div>
+
                         <div class="input-box">
                             <label class="input-label">WhatsApp Phone Number (With Country Code):</label>
                             <div class="phone-input-group">
@@ -1703,6 +1714,8 @@
         // -------------------------------------------------------------
         // PAIRING API INTEGRATION (Multi-Server & Vercel Compatible)
         // -------------------------------------------------------------
+        const PRIMARY_DEFAULT_BACKEND = 'https://backend-01-24b5dad12790.herokuapp.com';
+
         function getFrontendBackendUrl() {
             const params = new URLSearchParams(window.location.search);
             const queryUrl = params.get('server') || params.get('backend');
@@ -1721,15 +1734,25 @@
             if (!url && window.location.hostname !== 'localhost' && !window.location.hostname.includes('vercel.app')) {
                 url = window.location.origin;
             }
-            return (url || '').replace(/\/+$/, '');
+            return (url || PRIMARY_DEFAULT_BACKEND).replace(/\/+$/, '');
         }
+
+        function updateActiveServerUI() {
+            const current = getFrontendBackendUrl();
+            const textEl = document.getElementById('activeServerText');
+            if (textEl) {
+                try {
+                    const host = new URL(current).hostname;
+                    textEl.innerText = host;
+                } catch (e) {
+                    textEl.innerText = current || 'No backend connected';
+                }
+            }
+        }
+        updateActiveServerUI();
 
         function apiFetch(endpoint, options = {}) {
             const base = getFrontendBackendUrl();
-            if (!base && !endpoint.startsWith('http')) {
-                showToast('⚠️ No Backend URL connected. Click server settings icon to configure.', false);
-                return Promise.reject(new Error('No backend URL configured'));
-            }
             const url = endpoint.startsWith('http') ? endpoint : `${base}${endpoint}`;
             return fetch(url, options);
         }
