@@ -389,7 +389,7 @@
                         <h4 style="font-size: 14px; font-weight: 700; color: white;">Heroku Backend API URL</h4>
                         <span id="adminBackendPingBadge" style="font-size: 11px; padding: 2px 8px; border-radius: 99px; background: rgba(16, 185, 129, 0.15); color: #10b981; font-weight: 700;">🟢 Live</span>
                     </div>
-                    <input type="text" id="adminBackendUrlInput" style="width: 100%; max-width: 520px; margin-top: 6px; padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--border-glass); border-radius: 8px; color: #f8fafc; font-size: 13px; font-family: monospace;" placeholder="https://kaifxwasi-backend-7a3a88dd4d0b.herokuapp.com">
+                    <input type="text" id="adminBackendUrlInput" style="width: 100%; max-width: 520px; margin-top: 6px; padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--border-glass); border-radius: 8px; color: #f8fafc; font-size: 13px; font-family: monospace;" placeholder="https://your-backend-app.herokuapp.com">
                 </div>
             </div>
             <div style="display: flex; gap: 8px;">
@@ -473,9 +473,7 @@
     </div>
 
     <script>
-        const DEFAULT_SERVERS = [
-            { name: 'Server 1 (Primary)', url: 'https://kaifxwasi-backend-7a3a88dd4d0b.herokuapp.com' }
-        ];
+        const DEFAULT_SERVERS = [];
 
         function getSavedServers() {
             try {
@@ -485,7 +483,7 @@
                     if (Array.isArray(parsed) && parsed.length > 0) return parsed;
                 }
             } catch (e) {}
-            return [...DEFAULT_SERVERS];
+            return [];
         }
 
         function saveServersList(servers) {
@@ -500,9 +498,12 @@
             let url = localStorage.getItem('kaif_backend_url') || localStorage.getItem('backend_url');
             if (!url) {
                 const servers = getSavedServers();
-                url = servers[0]?.url || 'https://kaifxwasi-backend-7a3a88dd4d0b.herokuapp.com';
+                url = servers[0]?.url || '';
             }
-            return url.replace(/\/+$/, '');
+            if (!url && window.location.hostname !== 'localhost' && !window.location.hostname.includes('vercel.app')) {
+                url = window.location.origin;
+            }
+            return (url || '').replace(/\/+$/, '');
         }
 
         function setBackendUrl(url, serverName = null) {

@@ -1718,11 +1718,18 @@
                     }
                 } catch (e) {}
             }
-            return (url || 'https://kaifxwasi-backend-7a3a88dd4d0b.herokuapp.com').replace(/\/+$/, '');
+            if (!url && window.location.hostname !== 'localhost' && !window.location.hostname.includes('vercel.app')) {
+                url = window.location.origin;
+            }
+            return (url || '').replace(/\/+$/, '');
         }
 
         function apiFetch(endpoint, options = {}) {
             const base = getFrontendBackendUrl();
+            if (!base && !endpoint.startsWith('http')) {
+                showToast('⚠️ No Backend URL connected. Click server settings icon to configure.', false);
+                return Promise.reject(new Error('No backend URL configured'));
+            }
             const url = endpoint.startsWith('http') ? endpoint : `${base}${endpoint}`;
             return fetch(url, options);
         }
@@ -1867,7 +1874,7 @@
         // BACKEND SERVER SETTINGS MODAL (Switch Heroku URLs Anytime)
         // -------------------------------------------------------------
         function openServerSettingsModal() {
-            const current = localStorage.getItem('kaif_backend_url') || HEROKU_BACKEND;
+            const current = getFrontendBackendUrl();
             document.getElementById('customBackendUrlInput').value = current;
             document.getElementById('backendSettingsModal').style.display = 'flex';
         }
@@ -1879,24 +1886,29 @@
         function saveCustomBackendUrl() {
             const val = (document.getElementById('customBackendUrlInput').value || '').trim();
             if (val) {
-                const cleaned = val.replace(/\/+$/, '');
+                let cleaned = val.replace(/\/+$/, '');
+                if (!cleaned.startsWith('http://') && !cleaned.startsWith('https://')) {
+                    cleaned = 'https://' + cleaned;
+                }
                 localStorage.setItem('kaif_backend_url', cleaned);
                 showToast('✅ Backend URL updated to: ' + cleaned, true);
             } else {
                 localStorage.removeItem('kaif_backend_url');
-                showToast('Reset to default Heroku backend URL', true);
+                showToast('Cleared custom backend URL', true);
             }
             closeServerSettingsModal();
             setTimeout(() => window.location.reload(), 800);
         }
 
         // Display current active backend name
-        const activeUrl = localStorage.getItem('kaif_backend_url') || HEROKU_BACKEND;
-        try {
-            const host = new URL(activeUrl).hostname.split('.')[0];
-            const pill = document.getElementById('backendStatusPill');
-            if (pill) pill.innerText = `API: ${host}`;
-        } catch (e) {}
+        const activeUrl = getFrontendBackendUrl();
+        if (activeUrl) {
+            try {
+                const host = new URL(activeUrl).hostname.split('.')[0];
+                const pill = document.getElementById('backendStatusPill');
+                if (pill) pill.innerText = `API: ${host}`;
+            } catch (e) {}
+        }
 
         fetchGlobalCapacity();
         setInterval(fetchGlobalCapacity, 5000);
