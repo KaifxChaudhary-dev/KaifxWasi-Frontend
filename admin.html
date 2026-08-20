@@ -313,9 +313,21 @@
     <div id="loginScreen" class="login-box">
         <div class="login-icon"><i class="fa-solid fa-lock"></i></div>
         <h2 style="font-size: 22px; margin-bottom: 6px;">Admin Authorization</h2>
-        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">Enter master admin password to access session controls.</p>
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">Enter your backend URL and master admin password.</p>
         
-        <input type="password" id="adminPasswordInput" class="login-input" placeholder="Enter Master Admin Password" onkeypress="if(event.key==='Enter') loginAdmin()" />
+        <div style="text-align: left; margin-bottom: 12px;">
+            <label style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">
+                <i class="fa-solid fa-server" style="color: var(--primary);"></i> Heroku Backend URL
+            </label>
+            <input type="text" id="loginBackendUrlInput" class="login-input" style="font-family: monospace; font-size: 13px;" placeholder="https://your-app.herokuapp.com" />
+        </div>
+
+        <div style="text-align: left; margin-bottom: 16px;">
+            <label style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">
+                <i class="fa-solid fa-key" style="color: var(--emerald);"></i> Admin Password
+            </label>
+            <input type="password" id="adminPasswordInput" class="login-input" placeholder="Enter Master Admin Password" onkeypress="if(event.key==='Enter') loginAdmin()" />
+        </div>
         
         <button id="loginBtn" class="btn btn-primary" style="width: 100%; padding: 14px; justify-content: center; margin-bottom: 16px;" onclick="loginAdmin()">
             <i class="fa-solid fa-right-to-bracket"></i> Login to Admin Panel
@@ -323,7 +335,7 @@
 
         <div style="font-size: 11px; color: var(--text-secondary); border-top: 1px solid var(--border-glass); padding-top: 12px; text-align: left;">
             <div style="display: flex; justify-content: space-between; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                <span>Backend Target:</span>
+                <span>Active Target:</span>
                 <span id="loginTargetBackend" style="color: #10b981; font-family: monospace;">Connecting...</span>
             </div>
         </div>
@@ -447,8 +459,31 @@
         const HEROKU_BACKEND = 'https://kaifxwasi-backend-7a3a88dd4d0b.herokuapp.com';
 
         function getBackendUrl() {
-            return localStorage.getItem('kaif_backend_url') || HEROKU_BACKEND;
+            let url = localStorage.getItem('kaif_backend_url') || localStorage.getItem('backend_url') || HEROKU_BACKEND;
+            return url.replace(/\/+$/, '');
         }
+
+        function setBackendUrl(url) {
+            let clean = String(url || '').trim().replace(/\/+$/, '');
+            if (clean && !clean.startsWith('http://') && !clean.startsWith('https://')) {
+                clean = 'https://' + clean;
+            }
+            if (clean) {
+                localStorage.setItem('kaif_backend_url', clean);
+                localStorage.setItem('backend_url', clean);
+            }
+            return clean || getBackendUrl();
+        }
+
+        function updateLoginDisplay() {
+            const current = getBackendUrl();
+            const input = document.getElementById('loginBackendUrlInput');
+            if (input) input.value = current;
+            const targetSpan = document.getElementById('loginTargetBackend');
+            if (targetSpan) targetSpan.innerText = current;
+        }
+
+        updateLoginDisplay();
 
         function apiFetch(endpoint, options = {}) {
             const base = getBackendUrl();
@@ -459,8 +494,20 @@
         let adminKey = localStorage.getItem('admin_key') || '';
 
         async function loginAdmin() {
+            const inputUrl = document.getElementById('loginBackendUrlInput')?.value;
+            if (inputUrl) {
+                setBackendUrl(inputUrl);
+                updateLoginDisplay();
+            }
+
             const pwd = document.getElementById('adminPasswordInput').value;
             if (!pwd) return alert('Please enter admin password.');
+
+            const loginBtn = document.getElementById('loginBtn');
+            if (loginBtn) {
+                loginBtn.disabled = true;
+                loginBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
+            }
 
             try {
                 const res = await apiFetch('/api/admin/login', {
@@ -469,16 +516,26 @@
                     body: JSON.stringify({ password: pwd })
                 });
 
+                if (res.status === 401) {
+                    const data = await res.json().catch(() => ({}));
+                    return alert('❌ ' + (data.error || 'Invalid admin password! Try: kaifadmin123 or kaif123'));
+                }
+
                 const data = await res.json();
                 if (data.success) {
-                    adminKey = data.token;
+                    adminKey = data.token || pwd;
                     localStorage.setItem('admin_key', adminKey);
                     showAdminPanel();
                 } else {
-                    alert('Error: ' + data.error);
+                    alert('Error: ' + (data.error || 'Authentication failed.'));
                 }
             } catch (e) {
-                alert('Login failed. Check backend server status or verify Heroku dyno.');
+                alert(`❌ Cannot connect to backend server at:\n${getBackendUrl()}\n\nMake sure your Heroku Dyno is awake, or enter the correct backend URL in the box above!`);
+            } finally {
+                if (loginBtn) {
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Login to Admin Panel';
+                }
             }
         }
 
@@ -487,6 +544,7 @@
             adminKey = '';
             document.getElementById('adminPanel').style.display = 'none';
             document.getElementById('loginScreen').style.display = 'block';
+            updateLoginDisplay();
         }
 
         function showAdminPanel() {
