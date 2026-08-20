@@ -3,44 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KaifxWasi-Mini — Next-Gen Multi-Cluster WhatsApp Automation</title>
-    <meta name="description" content="KaifxWasi-Mini (WASI-MD-V7) is a high-speed multi-tenant WhatsApp bot platform featuring instant code pairing, AI commands, media downloaders, and cluster load balancing.">
+    <title>KaifxWasi-Mini — Next-Gen High-Speed WhatsApp Bot Platform</title>
+    <meta name="description" content="KaifxWasi-Mini (WASI-MD-V7) is a lightning-fast, multi-tenant WhatsApp bot and automation platform with AI intelligence, media downloaders, and instant code pairing.">
     
-    <!-- Google Fonts & Font Awesome -->
+    <!-- Google Fonts & Font Awesome Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
         :root {
-            --bg-base: #070913;
-            --bg-surface: #0e1326;
-            --bg-card: rgba(16, 23, 48, 0.72);
-            --bg-card-hover: rgba(24, 34, 70, 0.85);
-            --bg-input: rgba(11, 16, 36, 0.95);
+            --bg-base: #050711;
+            --bg-surface: #0a0e23;
+            --bg-card: rgba(14, 20, 48, 0.65);
+            --bg-card-hover: rgba(22, 32, 72, 0.85);
+            --bg-input: rgba(9, 13, 33, 0.95);
             
             --primary: #6366f1;
-            --primary-glow: rgba(99, 102, 241, 0.45);
-            --secondary: #8b5cf6;
-            --secondary-glow: rgba(139, 92, 246, 0.35);
-            --emerald: #10b981;
-            --emerald-glow: rgba(16, 185, 129, 0.4);
+            --primary-light: #818cf8;
+            --secondary: #a855f7;
+            --pink: #ec4899;
             --cyan: #06b6d4;
-            --rose: #f43f5e;
+            --emerald: #10b981;
             --amber: #f59e0b;
+            --rose: #f43f5e;
+            
+            --primary-glow: 0 0 35px rgba(99, 102, 241, 0.5);
+            --pink-glow: 0 0 35px rgba(236, 72, 153, 0.45);
+            --cyan-glow: 0 0 35px rgba(6, 182, 212, 0.45);
+            --emerald-glow: 0 0 30px rgba(16, 185, 129, 0.45);
             
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --text-dim: #64748b;
             
             --border-glass: rgba(255, 255, 255, 0.08);
-            --border-glow: rgba(99, 102, 241, 0.35);
-            --shadow-glass: 0 25px 60px -15px rgba(0, 0, 0, 0.7);
-            
+            --border-glow: rgba(99, 102, 241, 0.4);
             --radius-sm: 10px;
             --radius-md: 16px;
-            --radius-lg: 24px;
+            --radius-lg: 26px;
             --radius-full: 9999px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -63,59 +65,67 @@
         }
 
         /* -------------------------------------------------------------
-           AMBIENT ANIMATED BLOBS & BACKGROUND MESH
+           DYNAMIC MULTI-LAYER ANIMATED BACKGROUND MESH
         ------------------------------------------------------------- */
         .ambient-canvas {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            inset: 0;
             pointer-events: none;
             z-index: 0;
             overflow: hidden;
+        }
+
+        .ambient-grid {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black 30%, transparent 80%);
+            -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black 30%, transparent 80%);
         }
 
         .blob {
             position: absolute;
             border-radius: 50%;
             filter: blur(120px);
-            opacity: 0.22;
-            animation: floatBlob 22s infinite alternate ease-in-out;
+            opacity: 0.35;
+            animation: floatGlow 20s infinite alternate ease-in-out;
         }
 
         .blob-1 {
-            width: 600px;
-            height: 600px;
-            background: linear-gradient(135deg, var(--primary), #3b82f6);
-            top: -120px;
-            left: -120px;
+            width: 650px;
+            height: 650px;
+            background: linear-gradient(135deg, #6366f1, #3b82f6);
+            top: -150px;
+            left: -150px;
         }
 
         .blob-2 {
-            width: 650px;
-            height: 650px;
-            background: linear-gradient(135deg, var(--secondary), #ec4899);
-            top: 35%;
-            right: -180px;
-            animation-duration: 26s;
-            animation-delay: -6s;
+            width: 700px;
+            height: 700px;
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            top: 25%;
+            right: -200px;
+            animation-duration: 25s;
+            animation-delay: -5s;
         }
 
         .blob-3 {
-            width: 500px;
-            height: 500px;
-            background: linear-gradient(135deg, var(--emerald), var(--cyan));
-            bottom: -100px;
+            width: 550px;
+            height: 550px;
+            background: linear-gradient(135deg, #06b6d4, #10b981);
+            bottom: -150px;
             left: 20%;
-            animation-duration: 20s;
+            animation-duration: 22s;
             animation-delay: -10s;
         }
 
-        @keyframes floatBlob {
-            0% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(60px, 40px) scale(1.08); }
-            100% { transform: translate(-40px, 80px) scale(0.95); }
+        @keyframes floatGlow {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            50% { transform: translate(80px, 60px) scale(1.12) rotate(45deg); }
+            100% { transform: translate(-60px, 90px) scale(0.92) rotate(-30deg); }
         }
 
         /* Container */
@@ -127,17 +137,114 @@
             z-index: 1;
         }
 
-        /* Gradient Text */
+        /* Colorful Gradient Texts */
         .gradient-text {
-            background: linear-gradient(135deg, #fff 30%, var(--text-muted) 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .gradient-accent {
-            background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #38bdf8 100%);
+        .gradient-rainbow {
+            background: linear-gradient(135deg, #818cf8 0%, #c084fc 35%, #f472b6 70%, #38bdf8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shineGradient 6s linear infinite;
+        }
+
+        .gradient-emerald {
+            background: linear-gradient(135deg, #34d399 0%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes shineGradient {
+            to { background-position: 200% center; }
+        }
+
+        /* Navbar */
+        .navbar {
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            background: rgba(5, 7, 17, 0.75);
+            backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--border-glass);
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 21px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.5);
+            animation: pulseIcon 3s infinite alternate;
+        }
+
+        @keyframes pulseIcon {
+            0% { transform: scale(1); box-shadow: 0 0 20px rgba(99, 102, 241, 0.5); }
+            100% { transform: scale(1.05); box-shadow: 0 0 35px rgba(236, 72, 153, 0.7); }
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 14.5px;
+            font-weight: 600;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: #ffffff;
+        }
+
+        .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #6366f1, #ec4899);
+            border-radius: 99px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         /* Buttons */
@@ -160,15 +267,22 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            background-size: 200% auto;
             color: white;
-            box-shadow: 0 8px 25px var(--primary-glow);
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4);
+            animation: gradientMove 5s infinite linear;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.6);
-            opacity: 0.95;
+            box-shadow: 0 14px 40px rgba(236, 72, 153, 0.6);
         }
 
         .btn-primary:disabled {
@@ -178,168 +292,102 @@
         }
 
         .btn-ghost {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.04);
             color: var(--text-main);
             border: 1px solid var(--border-glass);
             backdrop-filter: blur(10px);
         }
 
         .btn-ghost:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.09);
             border-color: rgba(255, 255, 255, 0.2);
             transform: translateY(-2px);
         }
 
-        /* Navbar */
-        .navbar {
-            padding: 20px 0;
-            position: sticky;
-            top: 0;
-            background: rgba(7, 9, 19, 0.8);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border-glass);
-            z-index: 100;
-            transition: var(--transition);
-        }
-
-        .nav-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .brand-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: var(--text-main);
-            font-size: 20px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-
-        .brand-icon-box {
-            width: 42px;
-            height: 42px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 18px;
-            box-shadow: 0 0 20px var(--primary-glow);
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 28px;
-            list-style: none;
-        }
-
-        .nav-link {
-            text-decoration: none;
-            color: var(--text-muted);
-            font-size: 14.5px;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-
-        .nav-link:hover {
-            color: var(--text-main);
-        }
-
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 22px;
-            cursor: pointer;
-        }
-
         /* Hero Section */
         .hero-section {
-            padding: 48px 0 60px;
+            padding: 45px 0 60px;
             position: relative;
+        }
+
+        .hero-badge-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 16px;
         }
 
         .status-badge {
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            padding: 8px 18px;
+            padding: 8px 20px;
             border-radius: var(--radius-full);
             background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            margin-bottom: 16px;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
         }
 
         .pulse-dot {
-            width: 9px;
-            height: 9px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             background: var(--emerald);
-            box-shadow: 0 0 12px var(--emerald);
-            animation: pulseGlow 2s infinite;
+            box-shadow: 0 0 14px var(--emerald);
+            animation: pulseEmerald 1.8s infinite;
         }
 
-        @keyframes pulseGlow {
+        @keyframes pulseEmerald {
             0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.4); opacity: 0.6; }
+            50% { transform: scale(1.4); opacity: 0.5; }
         }
 
         .status-badge-text {
             font-size: 12.5px;
             font-weight: 800;
             letter-spacing: 1px;
-            color: var(--emerald);
+            color: #34d399;
             text-transform: uppercase;
         }
 
-        /* Hero Pairing Portal Card */
+        /* -------------------------------------------------------------
+           HERO PAIRING CARD (GLOWING GLASSMORPHISM)
+        ------------------------------------------------------------- */
         .hero-pairing-card {
             background: var(--bg-card);
-            backdrop-filter: blur(28px);
-            border: 1px solid var(--border-glass);
+            backdrop-filter: blur(32px);
             border-radius: var(--radius-lg);
             padding: 36px 32px;
-            box-shadow: var(--shadow-glass);
+            box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.85);
             position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            overflow: hidden;
         }
 
         .hero-pairing-card::before {
             content: '';
             position: absolute;
-            inset: -1px;
+            inset: 0;
             border-radius: var(--radius-lg);
-            padding: 1px;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), transparent 60%, rgba(139, 92, 246, 0.4));
+            padding: 2px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.6), rgba(236, 72, 153, 0.5), rgba(6, 182, 212, 0.5));
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             pointer-events: none;
         }
 
-        /* Cluster Server Bar (Directly Above Input) */
+        /* Safe Cluster Selector Bar */
         .cluster-node-bar {
-            background: rgba(255, 255, 255, 0.035);
-            border: 1px solid var(--border-glass);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(236, 72, 153, 0.05) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.25);
             border-radius: var(--radius-md);
-            padding: 12px 16px;
+            padding: 12px 18px;
             margin-bottom: 22px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 12px;
+            box-shadow: inset 0 0 20px rgba(99, 102, 241, 0.05);
         }
 
         .cluster-node-info {
@@ -353,57 +401,51 @@
         .node-pill {
             font-size: 11px;
             font-weight: 800;
-            padding: 3px 9px;
+            padding: 4px 10px;
             border-radius: var(--radius-full);
-            background: rgba(16, 185, 129, 0.15);
+            background: rgba(16, 185, 129, 0.18);
             color: #34d399;
-            border: 1px solid rgba(16, 185, 129, 0.3);
+            border: 1px solid rgba(16, 185, 129, 0.4);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .node-url-text {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12.5px;
+        .node-select-custom {
+            background: transparent;
+            border: none;
             color: #f1f5f9;
-            overflow: hidden;
+            font-weight: 700;
+            font-size: 13.5px;
+            outline: none;
+            cursor: pointer;
+            flex: 1;
             text-overflow: ellipsis;
             white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .node-select-custom option {
+            background: #0d132c;
+            color: white;
+            padding: 10px;
         }
 
         .node-latency-text {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11.5px;
-            color: var(--text-dim);
-            flex-shrink: 0;
-        }
-
-        .btn-change-server {
-            background: rgba(99, 102, 241, 0.15);
-            border: 1px solid var(--border-glow);
-            color: #a5b4fc;
+            font-family: 'Fira Code', monospace;
             font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            padding: 6px 14px;
-            border-radius: 8px;
+            color: #34d399;
             flex-shrink: 0;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: var(--transition);
-        }
-
-        .btn-change-server:hover {
-            background: rgba(99, 102, 241, 0.3);
-            color: white;
+            font-weight: 700;
         }
 
         /* Pairing Tabs */
         .pairing-tabs {
             display: flex;
-            background: rgba(6, 8, 18, 0.75);
+            background: rgba(6, 9, 23, 0.85);
             padding: 6px;
             border-radius: var(--radius-md);
             border: 1px solid var(--border-glass);
@@ -413,7 +455,7 @@
 
         .pair-tab-btn {
             flex: 1;
-            padding: 12px;
+            padding: 13px;
             border: none;
             background: transparent;
             color: var(--text-muted);
@@ -429,9 +471,9 @@
         }
 
         .pair-tab-btn.active {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
             color: white;
-            box-shadow: 0 4px 15px var(--primary-glow);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.5);
         }
 
         .pair-panel {
@@ -440,6 +482,12 @@
 
         .pair-panel.active {
             display: block;
+            animation: fadeInTab 0.35s ease;
+        }
+
+        @keyframes fadeInTab {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .input-box {
@@ -453,7 +501,6 @@
             font-weight: 700;
             color: var(--text-muted);
             margin-bottom: 8px;
-            letter-spacing: 0.2px;
         }
 
         .phone-input-group {
@@ -465,16 +512,16 @@
             left: 18px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--primary);
-            font-size: 17px;
+            color: #818cf8;
+            font-size: 18px;
         }
 
         .custom-input {
             width: 100%;
             background: var(--bg-input);
-            border: 1px solid var(--border-glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: var(--radius-md);
-            padding: 16px 16px 16px 48px;
+            padding: 16px 16px 16px 50px;
             color: var(--text-main);
             font-size: 16px;
             font-weight: 600;
@@ -483,57 +530,57 @@
         }
 
         .custom-input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
-            background: rgba(15, 23, 50, 0.95);
+            border-color: #a855f7;
+            box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.25);
+            background: rgba(14, 20, 48, 0.95);
         }
 
         .btn-full {
             width: 100%;
             padding: 16px;
-            font-size: 15.5px;
+            font-size: 16px;
         }
 
         /* Result Code Box */
         .code-reveal-box {
             display: none;
-            background: rgba(16, 185, 129, 0.08);
-            border: 2px dashed rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(6, 182, 212, 0.08) 100%);
+            border: 2px dashed rgba(16, 185, 129, 0.5);
             border-radius: var(--radius-md);
-            padding: 24px;
+            padding: 26px;
             text-align: center;
             margin-top: 22px;
-            animation: fadeIn 0.4s ease;
+            animation: scaleIn 0.4s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .code-header-text {
             font-size: 12px;
             font-weight: 800;
-            color: var(--emerald);
+            color: #34d399;
             letter-spacing: 2px;
             text-transform: uppercase;
         }
 
         .code-string {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 36px;
+            font-family: 'Fira Code', monospace;
+            font-size: 38px;
             font-weight: 900;
-            letter-spacing: 6px;
-            color: var(--emerald);
-            margin: 10px 0 16px 0;
-            text-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+            letter-spacing: 7px;
+            color: #34d399;
+            margin: 12px 0 18px 0;
+            text-shadow: 0 0 25px rgba(52, 211, 153, 0.6);
         }
 
         .btn-copy {
-            padding: 11px 22px;
+            padding: 12px 24px;
             border-radius: var(--radius-sm);
             border: none;
-            background: var(--emerald);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             font-weight: 700;
             font-size: 14px;
@@ -542,27 +589,28 @@
             align-items: center;
             gap: 8px;
             transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
         }
 
         .btn-copy:hover {
-            background: #059669;
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.6);
         }
 
         .steps-card {
-            margin-top: 18px;
+            margin-top: 20px;
             text-align: left;
-            font-size: 13px;
+            font-size: 13.5px;
             color: var(--text-muted);
             line-height: 1.7;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 16px 18px;
+            background: rgba(0, 0, 0, 0.45);
+            padding: 16px 20px;
             border-radius: var(--radius-sm);
             border: 1px solid var(--border-glass);
         }
 
         .steps-card ol {
-            margin-left: 18px;
+            margin-left: 20px;
             margin-top: 6px;
         }
 
@@ -570,7 +618,7 @@
             color: white;
         }
 
-        /* QR Panel */
+        /* QR Code Scanner Animated Panel */
         .qr-wrapper {
             display: flex;
             flex-direction: column;
@@ -580,51 +628,72 @@
         }
 
         .qr-frame {
-            width: 230px;
-            height: 230px;
-            border-radius: 18px;
+            width: 240px;
+            height: 240px;
+            border-radius: 20px;
             background: rgba(255, 255, 255, 0.03);
-            border: 2px dashed var(--border-glass);
+            border: 2px dashed rgba(99, 102, 241, 0.4);
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 20px;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.2);
+        }
+
+        .qr-scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #ec4899, #818cf8, transparent);
+            box-shadow: 0 0 15px #ec4899;
+            animation: scanMove 2.5s infinite ease-in-out;
+        }
+
+        @keyframes scanMove {
+            0% { top: 5%; opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { top: 95%; opacity: 0; }
         }
 
         /* Connected State Screen */
         .connected-state-card {
             display: none;
             text-align: center;
-            padding: 20px 0;
+            padding: 24px 0;
         }
 
         .connected-big-icon {
-            width: 80px;
-            height: 80px;
+            width: 84px;
+            height: 84px;
             border-radius: 50%;
             background: rgba(16, 185, 129, 0.15);
             border: 2px solid var(--emerald);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 36px;
+            font-size: 38px;
             color: var(--emerald);
             margin: 0 auto 20px;
-            box-shadow: 0 0 30px var(--emerald-glow);
-            animation: bounceIn 0.5s ease;
+            box-shadow: 0 0 35px var(--emerald-glow);
+            animation: bouncePop 0.5s ease;
         }
 
-        @keyframes bounceIn {
-            0% { transform: scale(0.5); opacity: 0; }
-            70% { transform: scale(1.1); }
+        @keyframes bouncePop {
+            0% { transform: scale(0.4); opacity: 0; }
+            70% { transform: scale(1.15); }
             100% { transform: scale(1); opacity: 1; }
         }
 
-        /* Stats Grid */
+        /* -------------------------------------------------------------
+           STATS COUNTER SECTION
+        ------------------------------------------------------------- */
         .stats-section {
-            padding: 40px 0;
+            padding: 40px 0 60px;
         }
 
         .stats-grid {
@@ -638,31 +707,53 @@
             backdrop-filter: blur(20px);
             border: 1px solid var(--border-glass);
             border-radius: var(--radius-md);
-            padding: 24px 20px;
+            padding: 26px 22px;
             text-align: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #6366f1, #ec4899);
+            opacity: 0;
             transition: var(--transition);
         }
 
         .stat-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--border-glow);
+            transform: translateY(-5px);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
         }
 
         .stat-number {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 900;
             margin-bottom: 4px;
+            letter-spacing: -1px;
         }
 
         .stat-label {
-            font-size: 13px;
+            font-size: 13.5px;
             color: var(--text-muted);
-            font-weight: 600;
+            font-weight: 700;
         }
 
-        /* Command Showcase Section */
+        /* -------------------------------------------------------------
+           COMMANDS SHOWCASE SECTION
+        ------------------------------------------------------------- */
         .commands-section {
-            padding: 60px 0;
+            padding: 40px 0 80px;
         }
 
         .section-header {
@@ -671,16 +762,16 @@
         }
 
         .section-title {
-            font-size: 32px;
+            font-size: 34px;
             font-weight: 900;
             letter-spacing: -1px;
             margin-bottom: 12px;
         }
 
         .section-desc {
-            font-size: 15.5px;
+            font-size: 16px;
             color: var(--text-muted);
-            max-width: 600px;
+            max-width: 620px;
             margin: 0 auto;
         }
 
@@ -689,32 +780,33 @@
             justify-content: center;
             gap: 10px;
             flex-wrap: wrap;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
         }
 
         .filter-chip {
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--border-glass);
             color: var(--text-muted);
-            padding: 8px 18px;
+            padding: 9px 20px;
             border-radius: var(--radius-full);
-            font-size: 13px;
+            font-size: 13.5px;
             font-weight: 700;
             cursor: pointer;
             transition: var(--transition);
         }
 
         .filter-chip.active, .filter-chip:hover {
-            background: var(--primary);
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
             color: white;
-            border-color: var(--primary);
-            box-shadow: 0 4px 15px var(--primary-glow);
+            border-color: #6366f1;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
         }
 
         .commands-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 20px;
         }
 
         .cmd-card {
@@ -722,85 +814,74 @@
             backdrop-filter: blur(16px);
             border: 1px solid var(--border-glass);
             border-radius: var(--radius-md);
-            padding: 20px;
+            padding: 22px;
             transition: var(--transition);
+            position: relative;
         }
 
         .cmd-card:hover {
-            border-color: var(--border-glow);
-            transform: translateY(-3px);
+            border-color: rgba(168, 85, 247, 0.5);
+            transform: translateY(-4px);
             background: var(--bg-card-hover);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
         }
 
         .cmd-name {
-            font-family: 'JetBrains Mono', monospace;
+            font-family: 'Fira Code', monospace;
             font-size: 15px;
             font-weight: 700;
             color: #818cf8;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
         .cmd-desc {
-            font-size: 13px;
+            font-size: 13.5px;
             color: var(--text-muted);
-            line-height: 1.5;
+            line-height: 1.55;
         }
 
-        /* Modal Overlay */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            padding: 20px;
+        /* -------------------------------------------------------------
+           FOOTER
+        ------------------------------------------------------------- */
+        .footer {
+            border-top: 1px solid var(--border-glass);
+            padding: 50px 0 35px;
+            background: rgba(5, 7, 17, 0.95);
+            text-align: center;
         }
 
-        .modal-card {
-            background: #0f172a;
-            border: 1px solid var(--border-glow);
-            border-radius: var(--radius-lg);
-            padding: 32px;
-            max-width: 480px;
-            width: 100%;
-            position: relative;
-            box-shadow: var(--shadow-glass);
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: none;
-            border: none;
-            color: var(--text-secondary);
+        .footer-logo {
             font-size: 22px;
-            cursor: pointer;
+            font-weight: 900;
+            margin-bottom: 12px;
         }
 
-        /* Toast */
+        .footer-copy {
+            font-size: 13.5px;
+            color: var(--text-dim);
+            margin-top: 16px;
+        }
+
+        /* Toast Notification */
         .toast {
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(16px);
+            background: rgba(13, 19, 44, 0.95);
+            backdrop-filter: blur(20px);
             border: 1px solid var(--emerald);
             color: white;
-            padding: 14px 24px;
+            padding: 15px 24px;
             border-radius: var(--radius-md);
             font-weight: 700;
             font-size: 14px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
             display: none;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             z-index: 10000;
             animation: slideIn 0.3s ease;
         }
@@ -821,30 +902,32 @@
             .nav-links, .nav-actions .btn-ghost {
                 display: none;
             }
-            .mobile-menu-btn {
-                display: block;
-            }
             .hero-pairing-card {
                 padding: 24px 18px;
             }
             .stats-grid {
                 grid-template-columns: 1fr;
             }
+            .code-string {
+                font-size: 28px;
+                letter-spacing: 4px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Ambient Background Blobs -->
+    <!-- Dynamic Animated Mesh Blobs -->
     <div class="ambient-canvas">
+        <div class="ambient-grid"></div>
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
         <div class="blob blob-3"></div>
     </div>
 
-    <!-- Toast Notification -->
+    <!-- Toast Notification Popup -->
     <div id="toast" class="toast">
-        <i class="fa-solid fa-circle-check" style="color: var(--emerald);"></i>
+        <i class="fa-solid fa-circle-check" style="color: var(--emerald); font-size: 18px;"></i>
         <span id="toastMsg">Notification Message</span>
     </div>
 
@@ -855,23 +938,22 @@
                 <div class="brand-icon-box">
                     <i class="fa-solid fa-robot"></i>
                 </div>
-                <span>KaifxWasi<span class="gradient-accent">-Mini</span></span>
+                <span>KaifxWasi<span class="gradient-rainbow">-Mini</span></span>
             </a>
 
             <ul class="nav-links">
                 <li><a href="#hero" class="nav-link">Home</a></li>
                 <li><a href="#hero" class="nav-link">Pair WhatsApp</a></li>
                 <li><a href="#commands" class="nav-link">Commands</a></li>
-                <li><a href="#clusters" class="nav-link">Multi-Cluster</a></li>
-                <li><a href="#faq" class="nav-link">FAQ</a></li>
+                <li><a href="#stats" class="nav-link">Stats</a></li>
             </ul>
 
             <div class="nav-actions">
                 <a href="/admin.html" class="btn btn-ghost" title="Admin Cluster Dashboard">
-                    <i class="fa-solid fa-user-shield"></i> Admin Panel
+                    <i class="fa-solid fa-user-shield"></i> Admin Portal
                 </a>
                 <a href="#hero" class="btn btn-primary">
-                    <i class="fa-solid fa-bolt"></i> Pair Now
+                    <i class="fa-solid fa-bolt"></i> Pair Bot Now
                 </a>
             </div>
         </div>
@@ -880,31 +962,36 @@
     <!-- Hero Section (PAIRING & QR CODE PORTAL) -->
     <section class="hero-section" id="hero">
         <div class="container" style="max-width: 650px;">
-            <!-- Brand & Status Header -->
-            <div style="text-align: center; margin-bottom: 24px;">
-                <div class="status-badge">
-                    <div class="pulse-dot"></div>
-                    <span class="status-badge-text" id="heroCapacity">CLUSTER READY & LIVE</span>
+            
+            <!-- Brand Status Header -->
+            <div style="text-align: center; margin-bottom: 26px;">
+                <div class="hero-badge-wrap">
+                    <div class="status-badge">
+                        <div class="pulse-dot"></div>
+                        <span class="status-badge-text" id="heroCapacity">CLUSTER READY & ACTIVE</span>
+                    </div>
                 </div>
-                <h1 style="font-size: clamp(28px, 4vw, 40px); font-weight: 900; letter-spacing: -1px; margin-bottom: 6px;">
-                    KaifxWasi<span class="gradient-accent">-Mini Platform</span>
+                <h1 style="font-size: clamp(30px, 4.5vw, 44px); font-weight: 900; letter-spacing: -1px; margin-bottom: 8px;">
+                    KaifxWasi<span class="gradient-rainbow">-Mini Platform</span>
                 </h1>
-                <p style="color: var(--text-muted); font-size: 14.5px;">
-                    Multi-Tenant Cloud WhatsApp Bot Pairing & Automation
+                <p style="color: var(--text-muted); font-size: 15px;">
+                    High-Speed Cloud WhatsApp Bot Pairing & Automation
                 </p>
             </div>
 
             <!-- THE PAIRING & QR PORTAL CARD -->
             <div class="hero-pairing-card">
                 
-                <!-- Cluster Server Selection Bar (Safe & Clean - No URLs exposed to public) -->
+                <!-- Safe Server Node Selector (Friendly Names Only - No Raw URLs Revealed) -->
                 <div class="cluster-node-bar">
                     <div class="cluster-node-info">
-                        <span class="node-pill" id="nodeStatusPill">🟢 Live</span>
-                        <select id="publicServerSelect" style="background: transparent; border: none; color: white; font-weight: 700; font-size: 13.5px; outline: none; cursor: pointer; flex: 1;" onchange="onPublicServerChange(this.value)">
-                            <!-- Populated dynamically with friendly names only -->
+                        <div class="node-pill">
+                            <i class="fa-solid fa-server"></i> Node
+                        </div>
+                        <select id="publicServerSelect" class="node-select-custom" onchange="onPublicServerChange(this.value)">
+                            <!-- Populated with friendly names -->
                         </select>
-                        <span class="node-latency-text" id="activeServerPing"></span>
+                        <span class="node-latency-text" id="activeServerPing">(12ms)</span>
                     </div>
                 </div>
 
@@ -913,11 +1000,11 @@
                     <div class="connected-big-icon">
                         <i class="fa-solid fa-check"></i>
                     </div>
-                    <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 6px;">Bot Connected & Active!</h3>
-                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;" id="connectedPhoneText">
-                        Your WhatsApp bot session is currently online and running in memory.
+                    <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 6px; color: white;">WhatsApp Bot Connected!</h3>
+                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 22px;" id="connectedPhoneText">
+                        Your WhatsApp bot session is currently online and active in cloud memory.
                     </p>
-                    <button class="btn btn-ghost" style="color: var(--rose); border-color: rgba(244, 63, 94, 0.3); width: 100%;" onclick="resetForm()">
+                    <button class="btn btn-ghost" style="color: var(--rose); border-color: rgba(244, 63, 94, 0.35); width: 100%;" onclick="resetForm()">
                         <i class="fa-solid fa-user-plus"></i> Pair Another Account
                     </button>
                 </div>
@@ -945,7 +1032,7 @@
                         </div>
 
                         <button class="btn btn-primary btn-full" id="getPairingCodeBtn" onclick="generatePairingCode()">
-                            <i class="fa-solid fa-paper-plane"></i> Get Pairing Code
+                            <i class="fa-solid fa-paper-plane"></i> Get 8-Digit Pairing Code
                         </button>
 
                         <div id="codeDisplayArea" class="code-reveal-box">
@@ -956,7 +1043,7 @@
                             </button>
 
                             <div class="steps-card">
-                                <strong>How to enter code on WhatsApp:</strong>
+                                <strong>How to link on your phone:</strong>
                                 <ol>
                                     <li>Open <strong>WhatsApp</strong> on your phone.</li>
                                     <li>Go to <strong>Settings ➔ Linked Devices ➔ Link a Device</strong>.</li>
@@ -971,10 +1058,11 @@
                     <div class="pair-panel" id="qrPanel">
                         <div class="qr-wrapper">
                             <div class="qr-frame" id="qrBoxContainer">
+                                <div class="qr-scan-line"></div>
                                 <i class="fa-solid fa-qrcode fa-3x" style="color: var(--text-dim);"></i>
                             </div>
                             <p style="color: var(--text-muted); font-size: 13.5px; margin-bottom: 16px;">
-                                Scan this QR code using your WhatsApp camera to link.
+                                Point your WhatsApp camera to scan and link instantly.
                             </p>
                             <button class="btn btn-ghost" onclick="refreshQR()">
                                 <i class="fa-solid fa-rotate-right"></i> Refresh QR Code
@@ -987,10 +1075,10 @@
     </section>
 
     <!-- Stats Section -->
-    <section class="stats-section">
+    <section class="stats-section" id="stats">
         <div class="container stats-grid">
             <div class="stat-card">
-                <div class="stat-number gradient-accent">80+</div>
+                <div class="stat-number gradient-rainbow">80+</div>
                 <div class="stat-label">Multi-Cluster Concurrency</div>
             </div>
             <div class="stat-card">
@@ -998,11 +1086,11 @@
                 <div class="stat-label">Bot Features & Plugins</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number gradient-accent">0ms</div>
+                <div class="stat-number gradient-emerald">0ms</div>
                 <div class="stat-label">In-Memory Command Speed</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number gradient-text">99.9%</div>
+                <div class="stat-number gradient-rainbow">99.9%</div>
                 <div class="stat-label">Cloud Dyno Uptime</div>
             </div>
         </div>
@@ -1027,35 +1115,46 @@
             <div class="commands-grid" id="commandsGrid">
                 <!-- Media -->
                 <div class="cmd-card" data-category="media">
-                    <div class="cmd-name"><i class="fa-brands fa-youtube"></i> .video / .play</div>
+                    <div class="cmd-name"><i class="fa-brands fa-youtube" style="color: #ef4444;"></i> .video / .play</div>
                     <div class="cmd-desc">High-speed YouTube video and audio streamer with multi-instance Invidious fallback.</div>
                 </div>
                 <div class="cmd-card" data-category="media">
-                    <div class="cmd-name"><i class="fa-brands fa-instagram"></i> .ig / .instagram</div>
+                    <div class="cmd-name"><i class="fa-brands fa-instagram" style="color: #ec4899;"></i> .ig / .instagram</div>
                     <div class="cmd-desc">Instant Instagram reels and post video downloader.</div>
                 </div>
                 <!-- Group -->
                 <div class="cmd-card" data-category="group">
-                    <div class="cmd-name"><i class="fa-solid fa-bullhorn"></i> .tagall / .mention</div>
+                    <div class="cmd-name"><i class="fa-solid fa-bullhorn" style="color: #f59e0b;"></i> .tagall / .mention</div>
                     <div class="cmd-desc">Admin mass announcement tagger with custom audio replies and emojis.</div>
                 </div>
                 <div class="cmd-card" data-category="group">
-                    <div class="cmd-name"><i class="fa-solid fa-shield-virus"></i> .antilink / .antibot</div>
+                    <div class="cmd-name"><i class="fa-solid fa-shield-virus" style="color: #10b981;"></i> .antilink / .antibot</div>
                     <div class="cmd-desc">Automated group spam shield that detects and removes malicious links and rogue bots.</div>
                 </div>
                 <!-- Audio -->
                 <div class="cmd-card" data-category="audio">
-                    <div class="cmd-name"><i class="fa-solid fa-music"></i> .bgm add &lt;trigger&gt;</div>
+                    <div class="cmd-name"><i class="fa-solid fa-music" style="color: #8b5cf6;"></i> .bgm add &lt;trigger&gt;</div>
                     <div class="cmd-desc">Custom keyword-triggered background voice notes with Catbox/Uguu CDN fallbacks.</div>
                 </div>
                 <!-- AI -->
                 <div class="cmd-card" data-category="ai">
-                    <div class="cmd-name"><i class="fa-solid fa-wand-magic-sparkles"></i> .ai / .gpt</div>
+                    <div class="cmd-name"><i class="fa-solid fa-wand-magic-sparkles" style="color: #06b6d4;"></i> .ai / .gpt</div>
                     <div class="cmd-desc">Direct intelligent conversational responses powered by Gemini & GPT models.</div>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-logo">
+                KaifxWasi<span class="gradient-rainbow">-Mini</span>
+            </div>
+            <p style="color: var(--text-muted); font-size: 14px;">Next-Generation Multi-Tenant WhatsApp Automation Infrastructure</p>
+            <p class="footer-copy">© 2026 KaifxWasi-Mini. All rights reserved.</p>
+        </div>
+    </footer>
 
     <!-- JavaScript Application Logic -->
     <script>
@@ -1117,7 +1216,7 @@
             let html = '';
             servers.forEach(s => {
                 const isSelected = s.url.toLowerCase() === current;
-                html += `<option value="${s.url}" ${isSelected ? 'selected' : ''} style="background: #0f172a; color: white;">🌐 ${s.name}</option>`;
+                html += `<option value="${s.url}" ${isSelected ? 'selected' : ''}>🌐 ${s.name}</option>`;
             });
             select.innerHTML = html;
             testServerPing(getFrontendBackendUrl());
@@ -1263,7 +1362,7 @@
                 const data = result.data;
                 
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Get Pairing Code';
+                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Get 8-Digit Pairing Code';
 
                 if (data.success && (data.pairingCode || data.code)) {
                     const code = data.pairingCode || data.code;
@@ -1278,7 +1377,7 @@
                 }
             } catch (e) {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Get Pairing Code';
+                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Get 8-Digit Pairing Code';
                 showToast(`❌ ${e.message}`, false);
             }
         }
@@ -1290,7 +1389,7 @@
             }
 
             const qrBox = document.getElementById('qrBoxContainer');
-            qrBox.innerHTML = '<i class="fa-solid fa-spinner fa-spin fa-3x" style="color: var(--primary);"></i>';
+            qrBox.innerHTML = '<div class="qr-scan-line"></div><i class="fa-solid fa-spinner fa-spin fa-3x" style="color: var(--primary);"></i>';
 
             try {
                 await apiFetch('/api/generate-qr', {
@@ -1324,7 +1423,7 @@
                     document.getElementById('connectedPhoneText').innerText = `WhatsApp account connected successfully on session: ${currentSessionId}`;
                     showToast('🎉 Bot Connected & Online!', true);
                 } else if (data.qr && activeTab === 'qr') {
-                    document.getElementById('qrBoxContainer').innerHTML = `<img src="${data.qr}" alt="QR" style="width:100%; height:100%; object-fit:contain; border-radius:12px;" />`;
+                    document.getElementById('qrBoxContainer').innerHTML = `<div class="qr-scan-line"></div><img src="${data.qr}" alt="QR" style="width:100%; height:100%; object-fit:contain; border-radius:14px;" />`;
                 }
             } catch (e) {}
         }
