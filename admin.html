@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>KaifxWasi-Mini — Admin Cluster Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-dark: #070913;
-            --bg-card: rgba(16, 23, 48, 0.75);
-            --bg-card-hover: rgba(24, 34, 70, 0.9);
+            --bg-card: rgba(16, 23, 48, 0.85);
+            --bg-card-hover: rgba(24, 34, 70, 0.95);
             --bg-input: rgba(11, 16, 36, 0.95);
             --primary: #6366f1;
             --primary-glow: rgba(99, 102, 241, 0.4);
@@ -20,7 +20,7 @@
             --danger: #ef4444;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --card-border: rgba(255, 255, 255, 0.08);
+            --card-border: rgba(255, 255, 255, 0.1);
             --card-glow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
             --radius-sm: 10px;
             --radius-md: 16px;
@@ -40,20 +40,14 @@
             background-color: var(--bg-dark);
             color: var(--text-main);
             min-height: 100vh;
-            padding: 24px;
+            padding: 20px 14px;
             display: flex;
             justify-content: center;
             align-items: flex-start;
             background-image: 
                 radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
                 radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
-        }
-
-        .ambient-canvas {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 0;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .container {
@@ -69,7 +63,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            padding: 11px 20px;
+            padding: 11px 18px;
             font-size: 13.5px;
             font-weight: 700;
             border-radius: var(--radius-md);
@@ -80,6 +74,7 @@
             color: var(--text-main);
             text-decoration: none;
             outline: none;
+            min-height: 42px;
         }
 
         .btn:hover {
@@ -97,6 +92,16 @@
         .btn-primary:hover {
             opacity: 0.95;
             box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-success {
+            background: rgba(16, 185, 129, 0.18);
+            color: #34d399;
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-success:hover {
+            background: rgba(16, 185, 129, 0.35);
         }
 
         .btn-danger {
@@ -128,14 +133,14 @@
 
         /* Login Screen */
         .login-box {
-            max-width: 450px;
-            margin: 60px auto;
+            max-width: 480px;
+            margin: 40px auto;
             text-align: center;
             background: var(--bg-card);
             backdrop-filter: blur(24px);
             border-radius: var(--radius-lg);
             border: 1px solid var(--card-border);
-            padding: 40px;
+            padding: 36px 28px;
             box-shadow: var(--card-glow);
         }
 
@@ -159,7 +164,7 @@
             backdrop-filter: blur(24px);
             border-radius: var(--radius-lg);
             border: 1px solid var(--card-border);
-            padding: 32px;
+            padding: 28px;
             box-shadow: var(--card-glow);
         }
 
@@ -167,7 +172,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 28px;
+            margin-bottom: 26px;
             flex-wrap: wrap;
             gap: 16px;
         }
@@ -205,16 +210,16 @@
         /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-bottom: 28px;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 14px;
+            margin-bottom: 26px;
         }
 
         .stat-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--card-border);
             border-radius: var(--radius-md);
-            padding: 20px 22px;
+            padding: 18px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -229,7 +234,7 @@
         }
 
         .stat-card p {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 800;
             color: white;
             margin-top: 4px;
@@ -237,16 +242,17 @@
         }
 
         .stat-card i {
-            font-size: 26px;
+            font-size: 24px;
             color: #818cf8;
         }
 
         /* Sessions Table */
         .table-container {
-            background: rgba(0, 0, 0, 0.25);
+            background: rgba(0, 0, 0, 0.3);
             border: 1px solid var(--card-border);
             border-radius: var(--radius-md);
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         table {
@@ -254,12 +260,13 @@
             border-collapse: collapse;
             text-align: left;
             font-size: 13.5px;
+            min-width: 600px;
         }
 
         th {
             background: rgba(255, 255, 255, 0.04);
-            padding: 16px 20px;
-            font-size: 12px;
+            padding: 14px 18px;
+            font-size: 11.5px;
             font-weight: 700;
             color: var(--text-muted);
             border-bottom: 1px solid var(--card-border);
@@ -268,7 +275,7 @@
         }
 
         td {
-            padding: 16px 20px;
+            padding: 14px 18px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         }
 
@@ -279,6 +286,7 @@
             border-radius: 20px;
             font-size: 11.5px;
             font-weight: 700;
+            white-space: nowrap;
         }
 
         .status-pill.online {
@@ -299,29 +307,86 @@
             border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
+        /* Server Cluster Management Cards */
+        .server-list-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin: 16px 0;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .server-item-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+        }
+
+        .server-item-card.active {
+            border-color: #6366f1;
+            background: rgba(99, 102, 241, 0.08);
+        }
+
+        .server-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .server-item-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .server-item-url {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            word-break: break-all;
+            margin-top: 3px;
+        }
+
+        .server-item-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
         /* Modal Overlay */
         .modal-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            padding: 20px;
+            padding: 16px;
         }
 
         .modal-card {
             background: #0f172a;
             border: 1px solid var(--card-border);
             border-radius: var(--radius-lg);
-            padding: 32px;
-            max-width: 440px;
+            padding: 26px 22px;
+            max-width: 520px;
             width: 100%;
-            text-align: center;
             position: relative;
             box-shadow: var(--card-glow);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-close {
@@ -333,6 +398,48 @@
             color: var(--text-muted);
             font-size: 22px;
             cursor: pointer;
+            line-height: 1;
+        }
+
+        /* Mobile View Optimizations */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px 8px;
+            }
+            .admin-app {
+                padding: 18px 14px;
+                border-radius: 18px;
+            }
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 14px;
+            }
+            .header > div:last-child {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .header select {
+                grid-column: 1 / -1;
+                width: 100% !important;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .login-box {
+                padding: 26px 18px;
+                margin: 20px auto;
+            }
+            .server-item-card {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            .server-item-actions {
+                justify-content: flex-end;
+            }
         }
     </style>
 </head>
@@ -344,15 +451,15 @@
         <div id="loginScreen" class="login-box">
             <div class="login-icon"><i class="fa-solid fa-user-shield"></i></div>
             <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 6px;">Admin Authorization</h2>
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 22px;">Select server cluster and enter master password.</p>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Select or replace backend server node and login.</p>
             
             <div style="text-align: left; margin-bottom: 14px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                     <label style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
-                        <i class="fa-solid fa-server" style="color: #818cf8;"></i> Server Cluster Node
+                        <i class="fa-solid fa-server" style="color: #818cf8;"></i> Active Cluster Node
                     </label>
-                    <a href="javascript:void(0)" onclick="promptAddNewServer()" style="font-size: 11.5px; color: #818cf8; text-decoration: none; font-weight: 700;">
-                        <i class="fa-solid fa-plus"></i> Add Node
+                    <a href="javascript:void(0)" onclick="openServerManagerModal()" style="font-size: 11.5px; color: #818cf8; text-decoration: none; font-weight: 700;">
+                        <i class="fa-solid fa-sliders"></i> Manage Nodes
                     </a>
                 </div>
                 <select id="loginServerSelect" class="login-input" style="font-family: monospace; font-size: 13px; margin-bottom: 8px; cursor: pointer;" onchange="onLoginServerSelectChange(this.value)">
@@ -365,7 +472,7 @@
                 <label style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 6px;">
                     <i class="fa-solid fa-key" style="color: var(--emerald);"></i> Master Admin Password
                 </label>
-                <input type="password" id="adminPasswordInput" class="login-input" placeholder="Enter Password" onkeypress="if(event.key==='Enter') loginAdmin()" />
+                <input type="password" id="adminPasswordInput" class="login-input" placeholder="Enter Password (e.g. kaifadmin123)" onkeypress="if(event.key==='Enter') loginAdmin()" />
             </div>
             
             <button id="loginBtn" class="btn btn-primary" style="width: 100%; padding: 14px;" onclick="loginAdmin()">
@@ -373,9 +480,9 @@
             </button>
 
             <div style="font-size: 11.5px; color: var(--text-muted); border-top: 1px solid var(--card-border); padding-top: 14px; margin-top: 18px; text-align: left;">
-                <div style="display: flex; justify-content: space-between;">
-                    <span>Active Target:</span>
-                    <span id="loginTargetBackend" style="color: #34d399; font-family: monospace;">Connecting...</span>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Active Server:</span>
+                    <span id="loginTargetBackend" style="color: #34d399; font-family: monospace; font-size: 12px; font-weight: 700;">Connecting...</span>
                 </div>
             </div>
         </div>
@@ -396,12 +503,12 @@
                         </div>
                     </div>
                 </div>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                    <select id="headerServerSelect" class="login-input" style="width: auto; padding: 8px 14px; font-size: 13px; cursor: pointer;" onchange="switchAdminServer(this.value)">
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                    <select id="headerServerSelect" class="login-input" style="width: auto; padding: 8px 12px; font-size: 13px; cursor: pointer;" onchange="switchAdminServer(this.value)">
                         <!-- Populated dynamically -->
                     </select>
-                    <button class="btn" onclick="promptAddNewServer()">
-                        <i class="fa-solid fa-plus"></i> Add Server Node
+                    <button class="btn" onclick="openServerManagerModal()">
+                        <i class="fa-solid fa-sliders"></i> Manage Nodes
                     </button>
                     <button class="btn btn-danger" onclick="logoutAdmin()">
                         <i class="fa-solid fa-power-off"></i> Logout
@@ -437,7 +544,7 @@
             <!-- Section Controls -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
                 <h3 style="font-size: 18px; font-weight: 800;"><i class="fa-solid fa-list-check" style="color: #818cf8;"></i> Live User Sessions</h3>
-                <div style="display: flex; gap: 10px;">
+                <div style="display: flex; gap: 8px;">
                     <button class="btn" onclick="fetchAdminSessions()">
                         <i class="fa-solid fa-rotate"></i> Refresh
                     </button>
@@ -475,9 +582,47 @@
     <!-- Session Detail Modal (QR / Code) -->
     <div id="sessionModal" class="modal-overlay">
         <div class="modal-card">
-            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <button class="modal-close" onclick="closeModal('sessionModal')">&times;</button>
             <h3 id="modalSessionTitle" style="font-size: 20px; font-weight: 800; margin-bottom: 14px; color: white;">Session Details</h3>
             <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- Server Cluster Manager Modal (Add / Edit / Replace / Delete) -->
+    <div id="serverManagerModal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 580px;">
+            <button class="modal-close" onclick="closeModal('serverManagerModal')">&times;</button>
+            <div style="text-align: left;">
+                <h3 style="font-size: 19px; font-weight: 800; color: white; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-server" style="color: #818cf8;"></i> Cluster Server Nodes Manager
+                </h3>
+                <p style="font-size: 12.5px; color: var(--text-muted); margin-top: 4px;">
+                    Add, edit, or permanently replace backend Heroku URLs. Changes save permanently.
+                </p>
+
+                <!-- Server List Container -->
+                <div id="serverManagerList" class="server-list-grid">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <!-- Add/Edit Server Form -->
+                <div style="background: rgba(0,0,0,0.35); border: 1px solid var(--card-border); border-radius: 14px; padding: 16px; margin-top: 14px;">
+                    <h4 id="serverFormTitle" style="font-size: 13px; font-weight: 700; color: #818cf8; margin-bottom: 10px; text-transform: uppercase;">
+                        <i class="fa-solid fa-plus-circle"></i> Add New Server Node
+                    </h4>
+                    <input type="hidden" id="editServerIndex" value="-1" />
+                    <div style="display: grid; gap: 8px; margin-bottom: 10px;">
+                        <input type="text" id="serverFormName" class="login-input" placeholder="Node Name (e.g. Server 2 Heroku)" />
+                        <input type="text" id="serverFormUrl" class="login-input" placeholder="Backend URL (e.g. https://my-app.herokuapp.com)" />
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                        <button id="cancelEditBtn" class="btn" style="display: none;" onclick="cancelEditServer()">Cancel</button>
+                        <button id="saveServerBtn" class="btn btn-primary" onclick="saveServerFromForm()">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Server Node
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -495,11 +640,12 @@
                     if (Array.isArray(parsed) && parsed.length > 0) return parsed;
                 }
             } catch (e) {}
-            return [...DEFAULT_SERVERS];
+            return JSON.parse(JSON.stringify(DEFAULT_SERVERS));
         }
 
         function saveServersList(servers) {
             localStorage.setItem('kaif_saved_servers', JSON.stringify(servers));
+            window.dispatchEvent(new Event('storage'));
         }
 
         function getBackendUrl() {
@@ -545,11 +691,10 @@
             let optionsHtml = '';
             servers.forEach(s => {
                 const isSelected = s.url.toLowerCase() === currentUrl;
-                optionsHtml += `<option value="${s.url}" ${isSelected ? 'selected' : ''}>🌐 ${s.name} (${s.url.replace(/^https?:\/\//, '').slice(0, 24)}...)</option>`;
+                optionsHtml += `<option value="${s.url}" ${isSelected ? 'selected' : ''}>🌐 ${s.name}</option>`;
             });
 
-            optionsHtml += `<option value="__custom__">✏️ Custom URL...</option>`;
-            optionsHtml += `<option value="__add__">➕ Add New Server Node...</option>`;
+            optionsHtml += `<option value="__manage__">⚙️ Manage & Replace Server URLs...</option>`;
 
             if (loginSelect) loginSelect.innerHTML = optionsHtml;
             if (headerSelect) headerSelect.innerHTML = optionsHtml;
@@ -558,58 +703,31 @@
             const badgeName = activeServer ? activeServer.name : 'Custom Server';
             const badgeEl = document.getElementById('activeServerNameBadge');
             if (badgeEl) badgeEl.innerText = badgeName;
+
+            const targetSpan = document.getElementById('loginTargetBackend');
+            if (targetSpan) {
+                try {
+                    targetSpan.innerText = `${activeServer ? activeServer.name : 'Node'} (${new URL(getBackendUrl()).hostname})`;
+                } catch(e) {
+                    targetSpan.innerText = getBackendUrl();
+                }
+            }
         }
 
         function onLoginServerSelectChange(val) {
-            if (val === '__add__') {
-                promptAddNewServer();
-                return;
-            }
-            if (val === '__custom__') {
-                document.getElementById('loginBackendUrlInput').focus();
+            if (val === '__manage__') {
+                openServerManagerModal();
+                populateServerDropdowns();
                 return;
             }
             setBackendUrl(val);
             updateLoginDisplay();
         }
 
-        function onCustomBackendInput(val) {
-            const trimmed = (val || '').trim();
-            if (trimmed) {
-                localStorage.setItem('kaif_backend_url', trimmed);
-                const targetSpan = document.getElementById('loginTargetBackend');
-                if (targetSpan) targetSpan.innerText = trimmed;
-            }
-        }
-
-        function promptAddNewServer() {
-            const name = prompt('Enter a friendly name for this server (e.g. "Server 2 Heroku"):');
-            if (!name || !name.trim()) return;
-            const url = prompt('Enter Backend URL (e.g. "https://my-backend-2.herokuapp.com"):');
-            if (!url || !url.trim()) return;
-
-            const cleanUrl = setBackendUrl(url, name.trim());
-            populateServerDropdowns();
-            updateLoginDisplay();
-            alert(`✅ Added and switched to [${name.trim()}]: ${cleanUrl}`);
-
-            if (document.getElementById('adminPanel').style.display !== 'none') {
-                fetchAdminSessions();
-            }
-        }
-
         function switchAdminServer(url) {
-            if (url === '__add__') {
-                promptAddNewServer();
-                return;
-            }
-            if (url === '__custom__') {
-                const custom = prompt('Enter custom Backend URL:');
-                if (custom && custom.trim()) {
-                    setBackendUrl(custom);
-                    populateServerDropdowns();
-                    fetchAdminSessions();
-                }
+            if (url === '__manage__') {
+                openServerManagerModal();
+                populateServerDropdowns();
                 return;
             }
             setBackendUrl(url);
@@ -617,22 +735,165 @@
             fetchAdminSessions();
         }
 
+        function onCustomBackendInput(val) {
+            const trimmed = (val || '').trim();
+            if (trimmed) {
+                setBackendUrl(trimmed);
+                const targetSpan = document.getElementById('loginTargetBackend');
+                if (targetSpan) targetSpan.innerText = trimmed;
+            }
+        }
+
         function updateLoginDisplay() {
             const current = getBackendUrl();
             const input = document.getElementById('loginBackendUrlInput');
             if (input) input.value = current;
-            const targetSpan = document.getElementById('loginTargetBackend');
-            if (targetSpan) {
-                try {
-                    targetSpan.innerText = new URL(current).hostname;
-                } catch (e) {
-                    targetSpan.innerText = current;
-                }
-            }
             populateServerDropdowns();
         }
 
         updateLoginDisplay();
+
+        /* Server Cluster Manager Modal Functions */
+        function openServerManagerModal() {
+            renderServerManagerList();
+            cancelEditServer();
+            document.getElementById('serverManagerModal').style.display = 'flex';
+        }
+
+        function renderServerManagerList() {
+            const servers = getSavedServers();
+            const currentUrl = getBackendUrl().toLowerCase();
+            const container = document.getElementById('serverManagerList');
+            if (!container) return;
+
+            if (servers.length === 0) {
+                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">No server nodes configured. Add one below!</div>`;
+                return;
+            }
+
+            let html = '';
+            servers.forEach((s, idx) => {
+                const isActive = s.url.toLowerCase() === currentUrl;
+                html += `
+                    <div class="server-item-card ${isActive ? 'active' : ''}">
+                        <div class="server-item-info">
+                            <div class="server-item-title">
+                                <i class="fa-solid fa-server" style="color: ${isActive ? '#10b981' : '#818cf8'};"></i>
+                                ${s.name}
+                                ${isActive ? '<span style="font-size: 10.5px; padding: 2px 7px; border-radius: 99px; background: rgba(16, 185, 129, 0.2); color: #34d399; font-weight: 800;">ACTIVE</span>' : ''}
+                            </div>
+                            <div class="server-item-url">${s.url}</div>
+                        </div>
+                        <div class="server-item-actions">
+                            ${!isActive ? `<button class="btn btn-success" style="padding: 6px 10px; font-size: 11.5px;" onclick="selectActiveServerIndex(${idx})"><i class="fa-solid fa-check"></i> Use</button>` : ''}
+                            <button class="btn" style="padding: 6px 10px; font-size: 11.5px;" onclick="startEditServer(${idx})"><i class="fa-solid fa-pen-to-square"></i> Replace</button>
+                            <button class="btn btn-danger" style="padding: 6px 10px; font-size: 11.5px;" onclick="deleteServerIndex(${idx})" ${servers.length <= 1 ? 'disabled style="opacity: 0.5;"' : ''}><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function selectActiveServerIndex(idx) {
+            const servers = getSavedServers();
+            if (servers[idx]) {
+                setBackendUrl(servers[idx].url);
+                renderServerManagerList();
+                populateServerDropdowns();
+                updateLoginDisplay();
+                if (document.getElementById('adminPanel').style.display !== 'none') {
+                    fetchAdminSessions();
+                }
+            }
+        }
+
+        function startEditServer(idx) {
+            const servers = getSavedServers();
+            const server = servers[idx];
+            if (!server) return;
+
+            document.getElementById('editServerIndex').value = idx;
+            document.getElementById('serverFormName').value = server.name;
+            document.getElementById('serverFormUrl').value = server.url;
+            document.getElementById('serverFormTitle').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Replace Server URL (${server.name})`;
+            document.getElementById('saveServerBtn').innerHTML = `<i class="fa-solid fa-check"></i> Update & Replace`;
+            document.getElementById('cancelEditBtn').style.display = 'inline-flex';
+            document.getElementById('serverFormUrl').focus();
+        }
+
+        function cancelEditServer() {
+            document.getElementById('editServerIndex').value = -1;
+            document.getElementById('serverFormName').value = '';
+            document.getElementById('serverFormUrl').value = '';
+            document.getElementById('serverFormTitle').innerHTML = `<i class="fa-solid fa-plus-circle"></i> Add New Server Node`;
+            document.getElementById('saveServerBtn').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Save Server Node`;
+            document.getElementById('cancelEditBtn').style.display = 'none';
+        }
+
+        function saveServerFromForm() {
+            const nameInput = document.getElementById('serverFormName');
+            const urlInput = document.getElementById('serverFormUrl');
+            const editIdx = parseInt(document.getElementById('editServerIndex').value, 10);
+
+            let name = (nameInput.value || '').trim();
+            let url = (urlInput.value || '').trim().replace(/\/+$/, '');
+
+            if (!url) return alert('Please enter a backend server URL.');
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+            }
+            if (!name) {
+                name = `Server ${editIdx >= 0 ? editIdx + 1 : getSavedServers().length + 1}`;
+            }
+
+            const servers = getSavedServers();
+
+            if (editIdx >= 0 && editIdx < servers.length) {
+                const oldUrl = servers[editIdx].url;
+                servers[editIdx].name = name;
+                servers[editIdx].url = url;
+                saveServersList(servers);
+
+                if (getBackendUrl().toLowerCase() === oldUrl.toLowerCase()) {
+                    setBackendUrl(url);
+                }
+                alert(`✅ Updated and replaced [${name}] with ${url}`);
+            } else {
+                servers.push({ name, url });
+                saveServersList(servers);
+                setBackendUrl(url);
+                alert(`✅ Added new server [${name}]: ${url}`);
+            }
+
+            cancelEditServer();
+            renderServerManagerList();
+            populateServerDropdowns();
+            updateLoginDisplay();
+
+            if (document.getElementById('adminPanel').style.display !== 'none') {
+                fetchAdminSessions();
+            }
+        }
+
+        function deleteServerIndex(idx) {
+            const servers = getSavedServers();
+            if (servers.length <= 1) return alert('At least one server node must remain.');
+            
+            const target = servers[idx];
+            if (!confirm(`Are you sure you want to remove server node [${target.name}]?\n${target.url}`)) return;
+
+            servers.splice(idx, 1);
+            saveServersList(servers);
+
+            if (getBackendUrl().toLowerCase() === target.url.toLowerCase()) {
+                setBackendUrl(servers[0].url);
+            }
+
+            renderServerManagerList();
+            populateServerDropdowns();
+            updateLoginDisplay();
+        }
 
         function apiFetch(endpoint, options = {}) {
             const base = getBackendUrl();
@@ -726,7 +987,7 @@
 
                     const tbody = document.getElementById('sessionsTableBody');
                     if (!data.sessions || data.sessions.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 32px;">No user sessions registered yet. Click "+ Create Session" to add one.</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 32px;">No user sessions registered on this node. Click "+ Create Session" to add one.</td></tr>';
                         return;
                     }
 
@@ -861,8 +1122,9 @@
             }
         }
 
-        function closeModal() {
-            document.getElementById('sessionModal').style.display = 'none';
+        function closeModal(id) {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
         }
 
         if (adminKey && getBackendUrl()) {
@@ -873,7 +1135,7 @@
             if (adminKey && document.getElementById('adminPanel').style.display !== 'none') {
                 fetchAdminSessions();
             }
-        }, 4000);
+        }, 5000);
     </script>
 </body>
 </html>
