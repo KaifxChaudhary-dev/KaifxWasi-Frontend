@@ -1064,20 +1064,17 @@
             <!-- THE RED/PINK VIP PAIRING CONSOLE CARD -->
             <div class="crimson-console-card">
                 
-                <!-- Safe Server Node Selector & Cluster Manager -->
-                <div class="cluster-node-bar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 22px;">
-                    <div class="cluster-node-info" style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 220px;">
+                <!-- Clean Public Server Node Selector (Users Can Only Switch Server Nodes) -->
+                <div class="cluster-node-bar" style="display: flex; align-items: center; gap: 10px; margin-bottom: 22px;">
+                    <div class="cluster-node-info" style="display: flex; align-items: center; gap: 8px; width: 100%;">
                         <div class="vip-node-pill">
                             <i class="fa-solid fa-server"></i> Node
                         </div>
-                        <select id="publicServerSelect" class="vip-select-node" style="flex: 1; cursor: pointer;" onchange="onPublicServerChange(this.value)">
-                            <!-- Populated dynamically with friendly names -->
+                        <select id="publicServerSelect" class="vip-select-node" style="flex: 1; cursor: pointer;" onchange="onPublicServerChange(this.value)" title="Select Server Node">
+                            <!-- Populated dynamically with friendly server names -->
                         </select>
                         <span class="node-ping-text" id="activeServerPing" style="font-family: monospace; font-size: 12px; font-weight: 700;">(12ms)</span>
                     </div>
-                    <button class="btn btn-ghost" style="padding: 6px 12px; font-size: 12px; border-radius: 10px; color: #ff2d75; border-color: rgba(255, 45, 117, 0.4);" onclick="openPublicServerModal()">
-                        <i class="fa-solid fa-sliders"></i> Manage Nodes
-                    </button>
                 </div>
 
                 <!-- Connected State Screen -->
@@ -1350,40 +1347,6 @@
         }
     </script>
 
-    <!-- Public Server Cluster Modal -->
-    <div id="publicServerModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); align-items: center; justify-content: center; z-index: 9999; padding: 16px;">
-        <div style="background: #140416; border: 1px solid var(--neon-pink); border-radius: 20px; padding: 24px 20px; max-width: 540px; width: 100%; position: relative; box-shadow: 0 15px 50px rgba(255,45,117,0.3); max-height: 90vh; overflow-y: auto;">
-            <button style="position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text-soft); font-size: 24px; cursor: pointer; line-height: 1;" onclick="closePublicServerModal()">&times;</button>
-            <h3 style="font-size: 19px; font-weight: 800; color: white; display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                <i class="fa-solid fa-server" style="color: var(--neon-pink);"></i> Cluster Server Nodes Manager
-            </h3>
-            <p style="font-size: 12.5px; color: var(--text-soft); margin-bottom: 16px;">
-                Switch between server nodes or add and replace custom backend Heroku URLs.
-            </p>
-
-            <div id="publicServerModalList" style="display: grid; gap: 10px; max-height: 300px; overflow-y: auto; margin-bottom: 16px; padding-right: 4px;">
-                <!-- Populated dynamically -->
-            </div>
-
-            <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--ruby-border); border-radius: 14px; padding: 16px;">
-                <h4 id="pubFormTitle" style="font-size: 12.5px; font-weight: 800; color: var(--neon-pink); margin-bottom: 10px; text-transform: uppercase;">
-                    <i class="fa-solid fa-plus-circle"></i> Add New Server Node
-                </h4>
-                <input type="hidden" id="pubEditIndex" value="-1" />
-                <div style="display: grid; gap: 8px; margin-bottom: 12px;">
-                    <input type="text" id="pubServerName" class="custom-input" placeholder="Node Name (e.g. Server 2 Heroku)" style="padding: 10px 14px; font-size: 13px;" />
-                    <input type="text" id="pubServerUrl" class="custom-input" placeholder="Backend URL (e.g. https://my-app.herokuapp.com)" style="padding: 10px 14px; font-size: 13px;" />
-                </div>
-                <div style="display: flex; justify-content: flex-end; gap: 8px;">
-                    <button id="pubCancelBtn" class="btn btn-ghost" style="display: none; padding: 8px 14px; font-size: 12px;" onclick="cancelPubEditServer()">Cancel</button>
-                    <button id="pubSaveBtn" class="btn btn-crimson" style="padding: 8px 16px; font-size: 12px;" onclick="savePubServerFromForm()">
-                        <i class="fa-solid fa-floppy-disk"></i> Save Server Node
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- JavaScript Application Core -->
     <script>
         const PRIMARY_DEFAULT_BACKEND = 'https://backend-01-24b5dad12790.herokuapp.com';
@@ -1400,11 +1363,6 @@
                 }
             } catch (e) {}
             return JSON.parse(JSON.stringify(DEFAULT_CLUSTER_SERVERS));
-        }
-
-        function saveServersList(servers) {
-            localStorage.setItem('kaif_saved_servers', JSON.stringify(servers));
-            window.dispatchEvent(new Event('storage'));
         }
 
         function getFrontendBackendUrl() {
@@ -1431,167 +1389,19 @@
                 const isSelected = s.url.toLowerCase() === current;
                 html += `<option value="${s.url}" ${isSelected ? 'selected' : ''}>🌐 ${s.name}</option>`;
             });
-            html += `<option value="__manage__">⚙️ Manage & Replace URLs...</option>`;
             select.innerHTML = html;
             testServerPing(getFrontendBackendUrl());
         }
 
         function onPublicServerChange(val) {
-            if (val === '__manage__') {
-                openPublicServerModal();
-                populatePublicServerDropdown();
-                return;
-            }
             if (val) {
                 localStorage.setItem('kaif_backend_url', val);
                 localStorage.setItem('backend_url', val);
                 testServerPing(val);
                 fetchGlobalCapacity();
                 const selName = document.getElementById('publicServerSelect')?.selectedOptions[0]?.text || 'server node';
-                showToast(`✅ Connected to ${selName}`, true);
+                showToast(`✅ Switched to ${selName}`, true);
             }
-        }
-
-        /* Public Server Modal Functions */
-        function openPublicServerModal() {
-            renderPublicServerModalList();
-            cancelPubEditServer();
-            const el = document.getElementById('publicServerModal');
-            if (el) el.style.display = 'flex';
-        }
-
-        function closePublicServerModal() {
-            const el = document.getElementById('publicServerModal');
-            if (el) el.style.display = 'none';
-        }
-
-        function renderPublicServerModalList() {
-            const servers = getSavedServersList();
-            const current = getFrontendBackendUrl().toLowerCase();
-            const container = document.getElementById('publicServerModalList');
-            if (!container) return;
-
-            let html = '';
-            servers.forEach((s, idx) => {
-                const isActive = s.url.toLowerCase() === current;
-                html += `
-                    <div style="background: rgba(255,255,255,0.03); border: 1px solid ${isActive ? '#ff2d75' : 'var(--border-glass)'}; border-radius: 12px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
-                        <div style="flex: 1; min-width: 180px;">
-                            <div style="font-size: 13.5px; font-weight: 800; color: white; display: flex; align-items: center; gap: 6px;">
-                                <i class="fa-solid fa-server" style="color: ${isActive ? '#ff2d75' : '#fb7185'};"></i>
-                                ${s.name}
-                                ${isActive ? '<span style="font-size: 10px; padding: 2px 6px; border-radius: 99px; background: rgba(255,45,117,0.25); color: #ff2d75; font-weight: 800;">ACTIVE</span>' : ''}
-                            </div>
-                            <div style="font-size: 11.5px; color: var(--text-soft); font-family: monospace; word-break: break-all; margin-top: 2px;">${s.url}</div>
-                        </div>
-                        <div style="display: flex; gap: 6px;">
-                            ${!isActive ? `<button class="btn btn-crimson" style="padding: 6px 10px; font-size: 11.5px;" onclick="selectPubActiveServer(${idx})"><i class="fa-solid fa-check"></i> Use</button>` : ''}
-                            <button class="btn btn-ghost" style="padding: 6px 10px; font-size: 11.5px;" onclick="startPubEditServer(${idx})"><i class="fa-solid fa-pen-to-square"></i> Replace</button>
-                            <button class="btn btn-ghost" style="padding: 6px 10px; font-size: 11.5px; color: #ef4444; border-color: rgba(239,68,68,0.3);" onclick="deletePubServer(${idx})" ${servers.length <= 1 ? 'disabled style="opacity:0.4;"' : ''}><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        function selectPubActiveServer(idx) {
-            const servers = getSavedServersList();
-            if (servers[idx]) {
-                localStorage.setItem('kaif_backend_url', servers[idx].url);
-                localStorage.setItem('backend_url', servers[idx].url);
-                populatePublicServerDropdown();
-                renderPublicServerModalList();
-                testServerPing(servers[idx].url);
-                fetchGlobalCapacity();
-                showToast(`✅ Switched to ${servers[idx].name}`, true);
-            }
-        }
-
-        function startPubEditServer(idx) {
-            const servers = getSavedServersList();
-            const server = servers[idx];
-            if (!server) return;
-
-            document.getElementById('pubEditIndex').value = idx;
-            document.getElementById('pubServerName').value = server.name;
-            document.getElementById('pubServerUrl').value = server.url;
-            document.getElementById('pubFormTitle').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Replace Server URL (${server.name})`;
-            document.getElementById('pubSaveBtn').innerHTML = `<i class="fa-solid fa-check"></i> Update & Replace`;
-            document.getElementById('pubCancelBtn').style.display = 'inline-flex';
-            document.getElementById('pubServerUrl').focus();
-        }
-
-        function cancelPubEditServer() {
-            document.getElementById('pubEditIndex').value = -1;
-            document.getElementById('pubServerName').value = '';
-            document.getElementById('pubServerUrl').value = '';
-            document.getElementById('pubFormTitle').innerHTML = `<i class="fa-solid fa-plus-circle"></i> Add New Server Node`;
-            document.getElementById('pubSaveBtn').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Save Server Node`;
-            document.getElementById('pubCancelBtn').style.display = 'none';
-        }
-
-        function savePubServerFromForm() {
-            const nameInput = document.getElementById('pubServerName');
-            const urlInput = document.getElementById('pubServerUrl');
-            const editIdx = parseInt(document.getElementById('pubEditIndex').value, 10);
-
-            let name = (nameInput.value || '').trim();
-            let url = (urlInput.value || '').trim().replace(/\/+$/, '');
-
-            if (!url) return showToast('Please enter backend server URL', false);
-            if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                url = 'https://' + url;
-            }
-            if (!name) {
-                name = `Server ${editIdx >= 0 ? editIdx + 1 : getSavedServersList().length + 1}`;
-            }
-
-            const servers = getSavedServersList();
-
-            if (editIdx >= 0 && editIdx < servers.length) {
-                const oldUrl = servers[editIdx].url;
-                servers[editIdx].name = name;
-                servers[editIdx].url = url;
-                saveServersList(servers);
-
-                if (getFrontendBackendUrl().toLowerCase() === oldUrl.toLowerCase()) {
-                    localStorage.setItem('kaif_backend_url', url);
-                    localStorage.setItem('backend_url', url);
-                }
-                showToast(`✅ Updated & replaced ${name}!`, true);
-            } else {
-                servers.push({ name, url });
-                saveServersList(servers);
-                localStorage.setItem('kaif_backend_url', url);
-                localStorage.setItem('backend_url', url);
-                showToast(`✅ Added ${name}!`, true);
-            }
-
-            cancelPubEditServer();
-            renderPublicServerModalList();
-            populatePublicServerDropdown();
-            window.dispatchEvent(new Event('storage'));
-        }
-
-        function deletePubServer(idx) {
-            const servers = getSavedServersList();
-            if (servers.length <= 1) return showToast('At least one server node must remain.', false);
-
-            const target = servers[idx];
-            if (!confirm(`Are you sure you want to remove server node [${target.name}]?\n${target.url}`)) return;
-
-            servers.splice(idx, 1);
-            saveServersList(servers);
-
-            if (getFrontendBackendUrl().toLowerCase() === target.url.toLowerCase()) {
-                localStorage.setItem('kaif_backend_url', servers[0].url);
-                localStorage.setItem('backend_url', servers[0].url);
-            }
-
-            renderPublicServerModalList();
-            populatePublicServerDropdown();
-            window.dispatchEvent(new Event('storage'));
         }
 
         window.addEventListener('storage', () => {
