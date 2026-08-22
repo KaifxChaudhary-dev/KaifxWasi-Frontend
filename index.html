@@ -1349,10 +1349,38 @@
 
     <!-- JavaScript Application Core -->
     <script>
-        const PRIMARY_DEFAULT_BACKEND = 'https://backend-01-24b5dad12790.herokuapp.com';
-        const DEFAULT_CLUSTER_SERVERS = [
+        let PRIMARY_DEFAULT_BACKEND = 'https://backend-01-24b5dad12790.herokuapp.com';
+        let DEFAULT_CLUSTER_SERVERS = [
             { name: 'Server 1 (Primary Node)', url: PRIMARY_DEFAULT_BACKEND }
         ];
+
+        async function loadGlobalConfigFile() {
+            try {
+                const res = await fetch('./config.json?t=' + Date.now());
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.backendUrl) {
+                        PRIMARY_DEFAULT_BACKEND = data.backendUrl;
+                        if (Array.isArray(data.servers) && data.servers.length > 0) {
+                            DEFAULT_CLUSTER_SERVERS = data.servers;
+                        } else {
+                            DEFAULT_CLUSTER_SERVERS = [{ name: 'Server 1 (Primary Node)', url: data.backendUrl }];
+                        }
+
+                        const params = new URLSearchParams(window.location.search);
+                        const queryUrl = params.get('server') || params.get('backend');
+                        if (queryUrl) {
+                            localStorage.setItem('kaif_backend_url', queryUrl.replace(/\/+$/, ''));
+                            localStorage.setItem('backend_url', queryUrl.replace(/\/+$/, ''));
+                        } else if (!localStorage.getItem('kaif_backend_url') && !localStorage.getItem('backend_url')) {
+                            localStorage.setItem('kaif_backend_url', data.backendUrl);
+                            localStorage.setItem('backend_url', data.backendUrl);
+                        }
+                        populatePublicServerDropdown();
+                    }
+                }
+            } catch (e) {}
+        }
 
         function getSavedServersList() {
             try {
@@ -1368,7 +1396,12 @@
         function getFrontendBackendUrl() {
             const params = new URLSearchParams(window.location.search);
             const queryUrl = params.get('server') || params.get('backend');
-            if (queryUrl) return queryUrl.replace(/\/+$/, '');
+            if (queryUrl) {
+                const clean = queryUrl.replace(/\/+$/, '');
+                localStorage.setItem('kaif_backend_url', clean);
+                localStorage.setItem('backend_url', clean);
+                return clean;
+            }
 
             let url = localStorage.getItem('kaif_backend_url') || localStorage.getItem('backend_url');
             if (!url) {
@@ -1636,6 +1669,7 @@
 
         // Initialize UI
         populatePublicServerDropdown();
+        loadGlobalConfigFile();
         fetchGlobalCapacity();
         setInterval(fetchGlobalCapacity, 6000);
 

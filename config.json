@@ -1,0 +1,9 @@
+{
+  "backendUrl": "https://backend-01-24b5dad12790.herokuapp.com",
+  "servers": [
+    {
+      "name": "Server 1 (Primary Node)",
+      "url": "https://backend-01-24b5dad12790.herokuapp.com"
+    }
+  ]
+}
