@@ -449,40 +449,41 @@
         
         <!-- Login View -->
         <div id="loginScreen" class="login-box">
-            <div class="login-icon"><i class="fa-solid fa-user-shield"></i></div>
+            <div class="login-icon"><i class="fa-solid fa-shield-halved"></i></div>
             <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 6px;">Admin Authorization</h2>
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Select or replace backend server node and login.</p>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 22px;">Enter your master password to manage your bot cluster.</p>
             
-            <div style="text-align: left; margin-bottom: 14px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <label style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
-                        <i class="fa-solid fa-server" style="color: #818cf8;"></i> Active Cluster Node
-                    </label>
-                    <a href="javascript:void(0)" onclick="openServerManagerModal()" style="font-size: 11.5px; color: #818cf8; text-decoration: none; font-weight: 700;">
-                        <i class="fa-solid fa-sliders"></i> Manage Nodes
-                    </a>
-                </div>
-                <select id="loginServerSelect" class="login-input" style="font-family: monospace; font-size: 13px; margin-bottom: 8px; cursor: pointer;" onchange="onLoginServerSelectChange(this.value)">
-                    <!-- Populated dynamically -->
-                </select>
-                <input type="text" id="loginBackendUrlInput" class="login-input" style="font-family: monospace; font-size: 13px;" placeholder="https://your-backend.herokuapp.com" oninput="onCustomBackendInput(this.value)" />
-            </div>
-
             <div style="text-align: left; margin-bottom: 18px;">
                 <label style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 6px;">
                     <i class="fa-solid fa-key" style="color: var(--emerald);"></i> Master Admin Password
                 </label>
-                <input type="password" id="adminPasswordInput" class="login-input" placeholder="Enter Password (e.g. kaifadmin123)" onkeypress="if(event.key==='Enter') loginAdmin()" />
+                <div style="position: relative;">
+                    <input type="password" id="adminPasswordInput" class="login-input" style="padding-right: 42px;" placeholder="••••••••" onkeypress="if(event.key==='Enter') loginAdmin()" />
+                    <button type="button" onclick="togglePasswordVisibility()" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px;">
+                        <i id="pwdEyeIcon" class="fa-solid fa-eye-slash"></i>
+                    </button>
+                </div>
             </div>
             
             <button id="loginBtn" class="btn btn-primary" style="width: 100%; padding: 14px;" onclick="loginAdmin()">
                 <i class="fa-solid fa-right-to-bracket"></i> Login to Admin Panel
             </button>
 
+            <!-- Optional Server Node Selector (Collapsed by default) -->
             <div style="font-size: 11.5px; color: var(--text-muted); border-top: 1px solid var(--card-border); padding-top: 14px; margin-top: 18px; text-align: left;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span>Active Server:</span>
-                    <span id="loginTargetBackend" style="color: #34d399; font-family: monospace; font-size: 12px; font-weight: 700;">Connecting...</span>
+                    <span>Active Node:</span>
+                    <span id="loginTargetBackend" style="color: #34d399; font-family: monospace; font-size: 12px; font-weight: 700;">Loading...</span>
+                </div>
+                <div style="margin-top: 6px; text-align: right;">
+                    <a href="javascript:void(0)" onclick="toggleLoginServerConfig()" style="font-size: 11px; color: #818cf8; text-decoration: none; font-weight: 600;">
+                        <i class="fa-solid fa-gear"></i> Change Server Node
+                    </a>
+                </div>
+                <div id="loginServerConfigSection" style="display: none; margin-top: 10px;">
+                    <select id="loginServerSelect" class="login-input" style="font-family: monospace; font-size: 12px; margin-bottom: 6px; cursor: pointer;" onchange="onLoginServerSelectChange(this.value)">
+                    </select>
+                    <input type="text" id="loginBackendUrlInput" class="login-input" style="font-family: monospace; font-size: 12px;" placeholder="https://your-backend.herokuapp.com" oninput="onCustomBackendInput(this.value)" />
                 </div>
             </div>
         </div>
@@ -574,6 +575,81 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Bot Configuration & Live Settings Editor -->
+            <div style="margin-top: 28px; background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 22px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h3 style="font-size: 17px; font-weight: 800; color: white;">
+                            <i class="fa-solid fa-sliders" style="color: #10b981;"></i> Bot Configuration & Feature Control
+                        </h3>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">Edit all bot parameters, prefixes, owners, and feature switches in real time.</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveAdminBotConfig()">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Configuration
+                    </button>
+                </div>
+
+                <!-- Config Inputs Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 18px;">
+                    <div>
+                        <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 5px;">Bot Name</label>
+                        <input type="text" id="cfgBotName" class="login-input" placeholder="Kaif-MD" />
+                    </div>
+                    <div>
+                        <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 5px;">Command Prefix</label>
+                        <input type="text" id="cfgPrefix" class="login-input" placeholder="." />
+                    </div>
+                    <div>
+                        <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 5px;">Owner Number</label>
+                        <input type="text" id="cfgOwnerNumber" class="login-input" placeholder="923453684061" />
+                    </div>
+                    <div>
+                        <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 5px;">Work Mode</label>
+                        <select id="cfgMode" class="login-input" style="cursor: pointer;">
+                            <option value="public">🌐 Public (Everyone)</option>
+                            <option value="private">🔒 Private (Owner Only)</option>
+                            <option value="group">👥 Group Chats Only</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Feature Toggles Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 11px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 12px; cursor: pointer;">
+                        <input type="checkbox" id="cfgAutoStatusSeen" style="width: 17px; height: 17px; accent-color: var(--primary);" />
+                        <span style="font-size: 12.5px; font-weight: 600; color: white;">👁️ Auto Status Seen</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 11px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 12px; cursor: pointer;">
+                        <input type="checkbox" id="cfgAutoStatusReact" style="width: 17px; height: 17px; accent-color: var(--primary);" />
+                        <span style="font-size: 12.5px; font-weight: 600; color: white;">💚 Auto Status React</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 11px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 12px; cursor: pointer;">
+                        <input type="checkbox" id="cfgAutoStatusSave" style="width: 17px; height: 17px; accent-color: var(--primary);" />
+                        <span style="font-size: 12.5px; font-weight: 600; color: white;">📥 Auto Status Save</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 11px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 12px; cursor: pointer;">
+                        <input type="checkbox" id="cfgAutoViewOnce" style="width: 17px; height: 17px; accent-color: var(--primary);" />
+                        <span style="font-size: 12.5px; font-weight: 600; color: white;">🔓 Auto ViewOnce</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 11px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 12px; cursor: pointer;">
+                        <input type="checkbox" id="cfgAntiDelete" style="width: 17px; height: 17px; accent-color: var(--primary);" />
+                        <span style="font-size: 12.5px; font-weight: 600; color: white;">🗑️ Anti-Delete</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 11px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 12px; cursor: pointer;">
+                        <input type="checkbox" id="cfgAntiEdit" style="width: 17px; height: 17px; accent-color: var(--primary);" />
+                        <span style="font-size: 12.5px; font-weight: 600; color: white;">✏️ Anti-Edit</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 11px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 12px; cursor: pointer;">
+                        <input type="checkbox" id="cfgAutoLevelUp" style="width: 17px; height: 17px; accent-color: var(--primary);" />
+                        <span style="font-size: 12.5px; font-weight: 600; color: white;">🎖️ Auto Level-Up</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 11px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 12px; cursor: pointer;">
+                        <input type="checkbox" id="cfgBgm" style="width: 17px; height: 17px; accent-color: var(--primary);" />
+                        <span style="font-size: 12.5px; font-weight: 600; color: white;">🎶 BGM Music</span>
+                    </label>
+                </div>
             </div>
         </div>
 
@@ -977,7 +1053,24 @@
             return fetch(url, options);
         }
 
-        let adminKey = localStorage.getItem('admin_key') || '';
+        function togglePasswordVisibility() {
+            const input = document.getElementById('adminPasswordInput');
+            const icon = document.getElementById('pwdEyeIcon');
+            if (!input || !icon) return;
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-solid fa-eye';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-solid fa-eye-slash';
+            }
+        }
+
+        function toggleLoginServerConfig() {
+            const section = document.getElementById('loginServerConfigSection');
+            if (!section) return;
+            section.style.display = section.style.display === 'none' ? 'block' : 'none';
+        }
 
         async function loginAdmin() {
             const inputUrl = document.getElementById('loginBackendUrlInput')?.value;
@@ -987,7 +1080,7 @@
             }
 
             const pwd = document.getElementById('adminPasswordInput').value;
-            if (!pwd) return alert('Please enter admin password.');
+            if (!pwd) return alert('Please enter master admin password.');
 
             const loginBtn = document.getElementById('loginBtn');
             if (loginBtn) {
@@ -1004,7 +1097,7 @@
 
                 if (res.status === 401) {
                     const data = await res.json().catch(() => ({}));
-                    return alert('❌ ' + (data.error || 'Invalid admin password! Try: kaifadmin123 or kaif123'));
+                    return alert('❌ ' + (data.error || 'Invalid admin password. Please try again.'));
                 }
 
                 const data = await res.json();
@@ -1016,7 +1109,7 @@
                     alert('Error: ' + (data.error || 'Authentication failed.'));
                 }
             } catch (e) {
-                alert(`❌ Cannot connect to server at:\n${getBackendUrl()}\n\nMake sure your Heroku Dyno is awake and running!`);
+                alert(`❌ Cannot connect to server node at:\n${getBackendUrl()}\n\nMake sure your server is online.`);
             } finally {
                 if (loginBtn) {
                     loginBtn.disabled = false;
@@ -1038,6 +1131,58 @@
             document.getElementById('adminPanel').style.display = 'block';
             populateServerDropdowns();
             fetchAdminSessions();
+            fetchAdminBotConfig();
+        }
+
+        async function fetchAdminBotConfig() {
+            try {
+                const res = await apiFetch('/api/config');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data) {
+                        if (document.getElementById('cfgBotName')) document.getElementById('cfgBotName').value = data.botName || 'Kaif-MD';
+                        if (document.getElementById('cfgPrefix')) document.getElementById('cfgPrefix').value = data.prefix || '.';
+                        if (document.getElementById('cfgOwnerNumber')) document.getElementById('cfgOwnerNumber').value = data.ownerNumber || '923453684061';
+                        if (document.getElementById('cfgMode')) document.getElementById('cfgMode').value = data.mode || 'public';
+                        if (document.getElementById('cfgAutoStatusSeen')) document.getElementById('cfgAutoStatusSeen').checked = data.autoStatusSeen !== false;
+                        if (document.getElementById('cfgAutoStatusReact')) document.getElementById('cfgAutoStatusReact').checked = data.autoStatusReact !== false;
+                        if (document.getElementById('cfgAutoStatusSave')) document.getElementById('cfgAutoStatusSave').checked = data.autoStatusSave === true;
+                        if (document.getElementById('cfgAutoViewOnce')) document.getElementById('cfgAutoViewOnce').checked = data.autoViewOnce !== false;
+                        if (document.getElementById('cfgAntiDelete')) document.getElementById('cfgAntiDelete').checked = data.antiDelete !== false;
+                        if (document.getElementById('cfgAntiEdit')) document.getElementById('cfgAntiEdit').checked = data.antiEdit !== false;
+                        if (document.getElementById('cfgAutoLevelUp')) document.getElementById('cfgAutoLevelUp').checked = data.autoLevelUp !== false;
+                        if (document.getElementById('cfgBgm')) document.getElementById('cfgBgm').checked = data.bgm !== false;
+                    }
+                }
+            } catch (e) {}
+        }
+
+        async function saveAdminBotConfig() {
+            const payload = {
+                botName: document.getElementById('cfgBotName')?.value || 'Kaif-MD',
+                prefix: document.getElementById('cfgPrefix')?.value || '.',
+                ownerNumber: document.getElementById('cfgOwnerNumber')?.value || '923453684061',
+                mode: document.getElementById('cfgMode')?.value || 'public',
+                autoStatusSeen: document.getElementById('cfgAutoStatusSeen')?.checked !== false,
+                autoStatusReact: document.getElementById('cfgAutoStatusReact')?.checked !== false,
+                autoStatusSave: document.getElementById('cfgAutoStatusSave')?.checked === true,
+                autoViewOnce: document.getElementById('cfgAutoViewOnce')?.checked !== false,
+                antiDelete: document.getElementById('cfgAntiDelete')?.checked !== false,
+                antiEdit: document.getElementById('cfgAntiEdit')?.checked !== false,
+                autoLevelUp: document.getElementById('cfgAutoLevelUp')?.checked !== false,
+                bgm: document.getElementById('cfgBgm')?.checked !== false
+            };
+
+            try {
+                const res = await apiFetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                alert('✅ Bot Configuration Saved Successfully to Active Node!');
+            } catch (e) {
+                alert('❌ Failed to save configuration: ' + e.message);
+            }
         }
 
         async function fetchAdminSessions() {
