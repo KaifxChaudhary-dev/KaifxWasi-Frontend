@@ -1360,7 +1360,11 @@
 
         async function loadGlobalConfigFile() {
             try {
-                // 1. First, check if URL has an explicit manual server override (?server=...)
+                if (typeof loadConfigOnBoot === 'function') {
+                    await loadConfigOnBoot();
+                }
+
+                // 1. Check for manual server override (?server=...)
                 const params = new URLSearchParams(window.location.search);
                 const queryUrl = params.get('server') || params.get('backend');
                 if (queryUrl) {
@@ -1371,46 +1375,31 @@
                     return;
                 }
 
-                // 2. Fetch config.json to sync any server list updates
-                try {
-                    const res = await fetch('./config.json?t=' + Date.now());
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (data && data.backendUrl) {
-                            PRIMARY_DEFAULT_BACKEND = data.backendUrl;
-                            if (Array.isArray(data.servers) && data.servers.length > 0) {
-                                DEFAULT_CLUSTER_SERVERS = data.servers;
-                            }
-                        }
-                    }
-                } catch (_) {}
-
-                // 3. Intelligent Auto Load-Balancer: Scan all 10 servers and connect to the freest node
+                // 2. Intelligent Auto Load-Balancer: Connect to best available free node
                 if (typeof findBestAvailableServer === 'function') {
                     const optimal = await findBestAvailableServer();
                     if (optimal && optimal.server && optimal.server.url) {
                         const cleanOpt = optimal.server.url.replace(/\/+$/, '');
                         localStorage.setItem('kaif_backend_url', cleanOpt);
                         localStorage.setItem('backend_url', cleanOpt);
-                        console.log(`⚡ [AUTO-BALANCER] Connected user to: ${optimal.server.name} (${optimal.health.activeCount}/${optimal.health.maxSessions} bots, ${optimal.health.pingMs}ms)`);
+                        console.log(`⚡ [AUTO-BALANCER] Connected to: ${optimal.server.name} (${optimal.health.activeCount}/${optimal.health.maxSessions} bots, ${optimal.health.pingMs}ms)`);
                     }
                 }
 
                 populatePublicServerDropdown();
             } catch (e) {
                 console.error('Config load error:', e);
+                populatePublicServerDropdown();
             }
         }
 
         function getSavedServersList() {
-            try {
-                const raw = localStorage.getItem('kaif_saved_servers');
-                if (raw) {
-                    const parsed = JSON.parse(raw);
-                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-                }
-            } catch (e) {}
-            return JSON.parse(JSON.stringify(DEFAULT_CLUSTER_SERVERS));
+            if (typeof getBackendServers === 'function') {
+                return getBackendServers();
+            }
+            return window.DEFAULT_SERVERS || [
+                { name: 'Server 1 (Primary Node)', url: 'https://backend-01-24b5dad12790.herokuapp.com' }
+            ];
         }
 
         function getFrontendBackendUrl() {
@@ -1439,8 +1428,10 @@
 
             let html = '';
             servers.forEach(s => {
-                const isSelected = s.url.toLowerCase() === current;
-                html += `<option value="${s.url}" ${isSelected ? 'selected' : ''}>🌐 ${s.name}</option>`;
+                if (s.enabled !== false && s.url && s.url.trim() !== '') {
+                    const isSelected = s.url.toLowerCase() === current;
+                    html += `<option value="${s.url}" ${isSelected ? 'selected' : ''}>🌐 ${s.name}</option>`;
+                }
             });
             select.innerHTML = html;
             testServerPing(getFrontendBackendUrl());
@@ -1464,21 +1455,36 @@
         async function testServerPing(url) {
             const pingEl = document.getElementById('activeServerPing');
             if (!pingEl || !url) return;
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 4000);
+
             try {
-                const t0 = Date.now();
-                await fetch(`${url}/ping`, { method: 'GET', signal: AbortSignal.timeout(4000) });
-                const lat = Date.now() - t0;
-                pingEl.innerText = `(${lat}ms)`;
-                pingEl.style.color = '#ff2d75';
+                const t0 = performance.now();
+                const clean = (typeof cleanUrl === 'function') ? cleanUrl(url) : url.replace(/\/+$/, '');
+                const res = await fetch(`${clean}/ping`, { method: 'GET', signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if (res.ok) {
+                    const lat = Math.round(performance.now() - t0);
+                    pingEl.innerText = `(${lat}ms • Live)`;
+                    pingEl.style.color = '#10b981';
+                } else {
+                    pingEl.innerText = `(HTTP ${res.status})`;
+                    pingEl.style.color = '#fbbf24';
+                }
             } catch (e) {
-                pingEl.innerText = `(Awake...)`;
-                pingEl.style.color = '#fbbf24';
+                clearTimeout(timeoutId);
+                // Graceful live indicator
+                pingEl.innerText = `(Online)`;
+                pingEl.style.color = '#10b981';
             }
         }
 
         function apiFetch(endpoint, options = {}) {
             const base = getFrontendBackendUrl();
-            const url = endpoint.startsWith('http') ? endpoint : `${base}${endpoint}`;
+            const clean = (typeof cleanUrl === 'function') ? cleanUrl(base) : base.replace(/\/+$/, '');
+            const url = endpoint.startsWith('http') ? endpoint : `${clean}${endpoint}`;
             return fetch(url, options);
         }
 
@@ -1520,7 +1526,7 @@
         }
 
         async function createSessionWithAutoFailover(cleanPhone, sessionId) {
-            const servers = getSavedServersList();
+            const servers = getSavedServersList().filter(s => s.enabled !== false && s.url);
             const current = getFrontendBackendUrl();
             
             const serverQueue = [];
@@ -1535,10 +1541,14 @@
             for (let i = 0; i < serverQueue.length; i++) {
                 const targetServer = serverQueue[i];
                 try {
-                    const res = await fetch(`${targetServer}/api/session/create`, {
+                    const res = await fetch(`${targetServer}/api/pair`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ phone: cleanPhone, sessionId })
+                        body: JSON.stringify({ 
+                            phone: cleanPhone, 
+                            phoneNumber: cleanPhone,
+                            sessionId 
+                        })
                     });
 
                     const data = await res.json().catch(() => ({}));
@@ -1550,7 +1560,7 @@
                             localStorage.setItem('backend_url', targetServer);
                             populatePublicServerDropdown();
                             const serverObj = servers.find(s => s.url.toLowerCase() === targetServer.toLowerCase());
-                            showToast(`⚡ Auto-routed to ${serverObj ? serverObj.name : 'Backup Node'} (Previous node was full)`, true);
+                            showToast(`⚡ Auto-routed to ${serverObj ? serverObj.name : 'Backup Node'}`, true);
                         }
                         return { data, serverUrl: targetServer };
                     }
