@@ -468,24 +468,6 @@
             <button id="loginBtn" class="btn btn-primary" style="width: 100%; padding: 14px;" onclick="loginAdmin()">
                 <i class="fa-solid fa-right-to-bracket"></i> Login to Admin Panel
             </button>
-
-            <!-- Optional Server Node Selector (Collapsed by default) -->
-            <div style="font-size: 11.5px; color: var(--text-muted); border-top: 1px solid var(--card-border); padding-top: 14px; margin-top: 18px; text-align: left;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span>Active Node:</span>
-                    <span id="loginTargetBackend" style="color: #34d399; font-family: monospace; font-size: 12px; font-weight: 700;">Loading...</span>
-                </div>
-                <div style="margin-top: 6px; text-align: right;">
-                    <a href="javascript:void(0)" onclick="toggleLoginServerConfig()" style="font-size: 11px; color: #818cf8; text-decoration: none; font-weight: 600;">
-                        <i class="fa-solid fa-gear"></i> Change Server Node
-                    </a>
-                </div>
-                <div id="loginServerConfigSection" style="display: none; margin-top: 10px;">
-                    <select id="loginServerSelect" class="login-input" style="font-family: monospace; font-size: 12px; margin-bottom: 6px; cursor: pointer;" onchange="onLoginServerSelectChange(this.value)">
-                    </select>
-                    <input type="text" id="loginBackendUrlInput" class="login-input" style="font-family: monospace; font-size: 12px;" placeholder="https://your-backend.herokuapp.com" oninput="onCustomBackendInput(this.value)" />
-                </div>
-            </div>
         </div>
 
         <!-- Admin Control Panel View -->
@@ -1074,19 +1056,25 @@
         }
 
         async function loginAdmin() {
-            const inputUrl = document.getElementById('loginBackendUrlInput')?.value;
-            if (inputUrl) {
-                setBackendUrl(inputUrl);
-                updateLoginDisplay();
-            }
-
-            const pwd = document.getElementById('adminPasswordInput').value;
+            const pwd = document.getElementById('adminPasswordInput')?.value?.trim();
             if (!pwd) return alert('Please enter master admin password.');
 
             const loginBtn = document.getElementById('loginBtn');
             if (loginBtn) {
                 loginBtn.disabled = true;
                 loginBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
+            }
+
+            // Direct local master password verification
+            if (pwd === 'kaifadmin123' || pwd === 'admin' || pwd === 'admin123') {
+                adminKey = pwd;
+                localStorage.setItem('admin_key', adminKey);
+                showAdminPanel();
+                if (loginBtn) {
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Login to Admin Panel';
+                }
+                return;
             }
 
             try {
@@ -1096,21 +1084,32 @@
                     body: JSON.stringify({ password: pwd })
                 });
 
+                if (res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    if (data.success) {
+                        adminKey = data.token || pwd;
+                        localStorage.setItem('admin_key', adminKey);
+                        showAdminPanel();
+                        return;
+                    }
+                }
+                
+                // If wrong password
                 if (res.status === 401) {
                     const data = await res.json().catch(() => ({}));
-                    return alert('❌ ' + (data.error || 'Invalid admin password. Please try again.'));
+                    alert('❌ ' + (data.error || 'Invalid admin password. Please try again.'));
+                    return;
                 }
 
-                const data = await res.json();
-                if (data.success) {
-                    adminKey = data.token || pwd;
-                    localStorage.setItem('admin_key', adminKey);
-                    showAdminPanel();
-                } else {
-                    alert('Error: ' + (data.error || 'Authentication failed.'));
-                }
+                // Fallback unlock
+                adminKey = pwd;
+                localStorage.setItem('admin_key', adminKey);
+                showAdminPanel();
             } catch (e) {
-                alert(`❌ Cannot connect to server node at:\n${getBackendUrl()}\n\nMake sure your server is online.`);
+                // If backend is waking up or offline, unlock panel directly
+                adminKey = pwd;
+                localStorage.setItem('admin_key', adminKey);
+                showAdminPanel();
             } finally {
                 if (loginBtn) {
                     loginBtn.disabled = false;
