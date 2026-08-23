@@ -1345,41 +1345,58 @@
                 out.scrollTop = out.scrollHeight;
             }, 350);
         }
-    </script>
+    <!-- Multi-Server Auto Load-Balancer & Cluster Engine -->
+    <script src="servers.js"></script>
 
     <!-- JavaScript Application Core -->
     <script>
         let PRIMARY_DEFAULT_BACKEND = 'https://backend-01-24b5dad12790.herokuapp.com';
-        let DEFAULT_CLUSTER_SERVERS = [
+        let DEFAULT_CLUSTER_SERVERS = (typeof DEFAULT_SERVERS !== 'undefined' && Array.isArray(DEFAULT_SERVERS)) ? DEFAULT_SERVERS : [
             { name: 'Server 1 (Primary Node)', url: PRIMARY_DEFAULT_BACKEND }
         ];
 
         async function loadGlobalConfigFile() {
             try {
-                const res = await fetch('./config.json?t=' + Date.now());
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data && data.backendUrl) {
-                        PRIMARY_DEFAULT_BACKEND = data.backendUrl;
-                        if (Array.isArray(data.servers) && data.servers.length > 0) {
-                            DEFAULT_CLUSTER_SERVERS = data.servers;
-                        } else {
-                            DEFAULT_CLUSTER_SERVERS = [{ name: 'Server 1 (Primary Node)', url: data.backendUrl }];
-                        }
+                // 1. First, check if URL has an explicit manual server override (?server=...)
+                const params = new URLSearchParams(window.location.search);
+                const queryUrl = params.get('server') || params.get('backend');
+                if (queryUrl) {
+                    const clean = queryUrl.replace(/\/+$/, '');
+                    localStorage.setItem('kaif_backend_url', clean);
+                    localStorage.setItem('backend_url', clean);
+                    populatePublicServerDropdown();
+                    return;
+                }
 
-                        const params = new URLSearchParams(window.location.search);
-                        const queryUrl = params.get('server') || params.get('backend');
-                        if (queryUrl) {
-                            localStorage.setItem('kaif_backend_url', queryUrl.replace(/\/+$/, ''));
-                            localStorage.setItem('backend_url', queryUrl.replace(/\/+$/, ''));
-                        } else if (!localStorage.getItem('kaif_backend_url') && !localStorage.getItem('backend_url')) {
-                            localStorage.setItem('kaif_backend_url', data.backendUrl);
-                            localStorage.setItem('backend_url', data.backendUrl);
+                // 2. Fetch config.json to sync any server list updates
+                try {
+                    const res = await fetch('./config.json?t=' + Date.now());
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data && data.backendUrl) {
+                            PRIMARY_DEFAULT_BACKEND = data.backendUrl;
+                            if (Array.isArray(data.servers) && data.servers.length > 0) {
+                                DEFAULT_CLUSTER_SERVERS = data.servers;
+                            }
                         }
-                        populatePublicServerDropdown();
+                    }
+                } catch (_) {}
+
+                // 3. Intelligent Auto Load-Balancer: Scan all 10 servers and connect to the freest node
+                if (typeof findBestAvailableServer === 'function') {
+                    const optimal = await findBestAvailableServer();
+                    if (optimal && optimal.server && optimal.server.url) {
+                        const cleanOpt = optimal.server.url.replace(/\/+$/, '');
+                        localStorage.setItem('kaif_backend_url', cleanOpt);
+                        localStorage.setItem('backend_url', cleanOpt);
+                        console.log(`⚡ [AUTO-BALANCER] Connected user to: ${optimal.server.name} (${optimal.health.activeCount}/${optimal.health.maxSessions} bots, ${optimal.health.pingMs}ms)`);
                     }
                 }
-            } catch (e) {}
+
+                populatePublicServerDropdown();
+            } catch (e) {
+                console.error('Config load error:', e);
+            }
         }
 
         function getSavedServersList() {

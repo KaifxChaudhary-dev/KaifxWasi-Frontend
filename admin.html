@@ -718,10 +718,12 @@
         </div>
     </div>
 
+    <!-- Multi-Server Cluster Configuration & Health Manager -->
+    <script src="servers.js"></script>
     <script>
         let PRIMARY_DEFAULT_BACKEND = 'https://backend-01-24b5dad12790.herokuapp.com';
-        let DEFAULT_SERVERS = [
-            { name: 'Server 1 (Primary)', url: PRIMARY_DEFAULT_BACKEND }
+        let DEFAULT_SERVERS = (typeof window.DEFAULT_SERVERS !== 'undefined' && Array.isArray(window.DEFAULT_SERVERS)) ? window.DEFAULT_SERVERS : [
+            { id: 1, name: 'Server 1 (Primary)', url: PRIMARY_DEFAULT_BACKEND, enabled: true }
         ];
 
         async function loadGlobalConfigFile() {
@@ -733,22 +735,22 @@
                         PRIMARY_DEFAULT_BACKEND = data.backendUrl;
                         if (Array.isArray(data.servers) && data.servers.length > 0) {
                             DEFAULT_SERVERS = data.servers;
-                        } else {
-                            DEFAULT_SERVERS = [{ name: 'Server 1 (Primary Node)', url: data.backendUrl }];
                         }
-
-                        const params = new URLSearchParams(window.location.search);
-                        const queryUrl = params.get('server') || params.get('backend');
-                        if (queryUrl) {
-                            setBackendUrl(queryUrl);
-                        } else if (!localStorage.getItem('kaif_backend_url') && !localStorage.getItem('backend_url')) {
-                            setBackendUrl(data.backendUrl);
-                        }
-                        populateServerDropdowns();
-                        updateLoginDisplay();
                     }
                 }
-            } catch (e) {}
+
+                const params = new URLSearchParams(window.location.search);
+                const queryUrl = params.get('server') || params.get('backend');
+                if (queryUrl) {
+                    setBackendUrl(queryUrl);
+                } else if (!localStorage.getItem('kaif_backend_url') && !localStorage.getItem('backend_url')) {
+                    setBackendUrl(PRIMARY_DEFAULT_BACKEND);
+                }
+                populateServerDropdowns();
+                updateLoginDisplay();
+            } catch (e) {
+                console.error('Config load error:', e);
+            }
         }
 
         function getSavedServers() {
