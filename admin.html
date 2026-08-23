@@ -201,7 +201,7 @@
             font-family: var(--font-mono);
         }
 
-        /* Server Grid */
+        /* Section Header */
         .section-header {
             display: flex;
             justify-content: space-between;
@@ -217,6 +217,7 @@
             gap: 10px;
         }
 
+        /* Server Grid */
         .server-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -409,6 +410,72 @@
             justify-content: center;
         }
 
+        /* Sessions Table */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+
+        table.glass-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        table.glass-table th {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 14px 18px;
+            color: var(--text-dim);
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        table.glass-table td {
+            padding: 14px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            vertical-align: middle;
+        }
+
+        table.glass-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .status-pill {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-pill.online {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34D399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-pill.waiting {
+            background: rgba(245, 158, 11, 0.15);
+            color: #FBBF24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .status-pill.offline {
+            background: rgba(239, 68, 68, 0.15);
+            color: #F87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
         /* Modal */
         .modal-overlay {
             position: fixed;
@@ -464,7 +531,7 @@
             border: 1px solid var(--border);
             border-radius: 10px;
             color: white;
-            font-family: var(--font-mono);
+            font-family: var(--font-main);
             font-size: 13px;
             outline: none;
             transition: all 0.2s;
@@ -636,6 +703,45 @@
             <div class="server-grid" id="serverGrid">
                 <!-- Rendered dynamically via JavaScript -->
             </div>
+
+            <!-- CONNECTED USER BOTS & SESSIONS SECTION -->
+            <div class="section-header" style="margin-top: 40px;">
+                <h2><i class="fa-brands fa-whatsapp" style="color: #25D366;"></i> Connected User Bots & Sessions</h2>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <select id="sessionServerFilter" class="form-control" style="width: auto; padding: 8px 12px; font-size: 12px; cursor: pointer;" onchange="fetchClusterSessions()">
+                        <option value="all">🌐 All Cluster Nodes</option>
+                    </select>
+                    <button class="btn btn-primary" style="font-size: 12px; padding: 8px 14px;" onclick="openCreateSessionModal()">
+                        <i class="fa-solid fa-plus"></i> + Create Session
+                    </button>
+                    <button class="btn btn-secondary" style="font-size: 12px; padding: 8px 14px;" onclick="fetchClusterSessions(true)">
+                        <i class="fa-solid fa-rotate"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="glass-panel table-container">
+                <table class="glass-table">
+                    <thead>
+                        <tr>
+                            <th>Session ID</th>
+                            <th>Phone Number</th>
+                            <th>Server Node</th>
+                            <th>Status</th>
+                            <th>Pairing Code</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sessionsTableBody">
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: var(--text-dim); padding: 32px;">
+                                <i class="fa-solid fa-spinner fa-spin" style="margin-right: 8px; color: var(--primary);"></i> Loading cluster user sessions...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
         </div>
     </div>
 
@@ -644,7 +750,7 @@
         <div class="modal">
             <div class="modal-header">
                 <h3 style="font-size: 18px; font-weight: 600;" id="modalTitle">Edit Backend Server</h3>
-                <button onclick="closeModal()" style="background: none; border: none; color: var(--text-dim); font-size: 18px; cursor: pointer;">
+                <button onclick="closeModal('editModal')" style="background: none; border: none; color: var(--text-dim); font-size: 18px; cursor: pointer;">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -668,11 +774,64 @@
             </div>
 
             <div style="display: flex; gap: 10px; margin-top: 24px;">
-                <button class="btn btn-secondary" style="flex: 1; justify-content: center;" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-secondary" style="flex: 1; justify-content: center;" onclick="closeModal('editModal')">Cancel</button>
                 <button class="btn btn-primary" style="flex: 1; justify-content: center;" onclick="saveServerModal()">
                     <i class="fa-solid fa-floppy-disk"></i> Save & Test
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- CREATE USER SESSION MODAL -->
+    <div class="modal-overlay" id="createSessionModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 style="font-size: 18px; font-weight: 600;">Create User WhatsApp Bot</h3>
+                <button onclick="closeModal('createSessionModal')" style="background: none; border: none; color: var(--text-dim); font-size: 18px; cursor: pointer;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="form-group">
+                <label>Target Backend Server Node</label>
+                <select id="createTargetServerSelect" class="form-control">
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>User Phone Number (With Country Code)</label>
+                <input type="tel" id="createPhoneNumberInput" class="form-control" placeholder="e.g. 923453684061">
+                <small style="color: var(--text-subtle); font-size: 11px; margin-top: 4px; display: block;">
+                    Enter number with country code without '+' (e.g. 923453684061).
+                </small>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 24px;">
+                <button class="btn btn-secondary" style="flex: 1; justify-content: center;" onclick="closeModal('createSessionModal')">Cancel</button>
+                <button class="btn btn-primary" id="btnSubmitCreateSession" style="flex: 1; justify-content: center;" onclick="submitCreateSession()">
+                    <i class="fa-solid fa-bolt"></i> Generate Pairing
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR CODE VIEWER MODAL -->
+    <div class="modal-overlay" id="qrModal">
+        <div class="modal" style="text-align: center;">
+            <div class="modal-header">
+                <h3 style="font-size: 18px; font-weight: 600;" id="qrModalTitle">Session QR Code</h3>
+                <button onclick="closeModal('qrModal')" style="background: none; border: none; color: var(--text-dim); font-size: 18px; cursor: pointer;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div id="qrModalBody" style="padding: 20px 0;">
+                <!-- QR Image or Status rendered here -->
+            </div>
+
+            <button class="btn btn-secondary" style="width: 100%; justify-content: center;" onclick="closeModal('qrModal')">
+                Close
+            </button>
         </div>
     </div>
 
@@ -688,6 +847,7 @@
     <script>
         let currentEditingId = null;
         let clusterHealthData = {};
+        let clusterSessionsList = [];
 
         // Authentication Handler
         function authenticateAdmin() {
@@ -712,10 +872,44 @@
             if (typeof loadConfigOnBoot === 'function') {
                 await loadConfigOnBoot();
             }
+            populateSessionFilterDropdown();
             renderServerSlots();
             await refreshAllServers();
-            // Auto refresh every 20 seconds
+            await fetchClusterSessions();
+
+            // Auto refresh cluster stats every 20s and sessions every 8s
             setInterval(() => refreshAllServers(false), 20000);
+            setInterval(() => fetchClusterSessions(false), 8000);
+        }
+
+        function populateSessionFilterDropdown() {
+            const servers = getBackendServers();
+            const filterSelect = document.getElementById('sessionServerFilter');
+            const targetSelect = document.getElementById('createTargetServerSelect');
+
+            if (filterSelect) {
+                filterSelect.innerHTML = '<option value="all">🌐 All Cluster Nodes</option>';
+                servers.forEach(s => {
+                    if (s.enabled && s.url) {
+                        const opt = document.createElement('option');
+                        opt.value = s.url;
+                        opt.innerText = s.name;
+                        filterSelect.appendChild(opt);
+                    }
+                });
+            }
+
+            if (targetSelect) {
+                targetSelect.innerHTML = '';
+                servers.forEach(s => {
+                    if (s.enabled && s.url) {
+                        const opt = document.createElement('option');
+                        opt.value = s.url;
+                        opt.innerText = s.name;
+                        targetSelect.appendChild(opt);
+                    }
+                });
+            }
         }
 
         // Render Server Cards
@@ -848,6 +1042,235 @@
             }
         }
 
+        // Fetch User Sessions across cluster
+        async function fetchClusterSessions(showToastMsg = false) {
+            const adminKey = sessionStorage.getItem('kaif_admin_auth') || 'kaifadmin123';
+            const servers = getBackendServers();
+            const filterVal = document.getElementById('sessionServerFilter')?.value || 'all';
+
+            const targetServers = filterVal === 'all'
+                ? servers.filter(s => s.enabled && s.url && s.url.trim() !== '')
+                : servers.filter(s => s.url === filterVal);
+
+            let mergedSessions = [];
+
+            await Promise.all(targetServers.map(async (server) => {
+                try {
+                    const clean = cleanUrl(server.url);
+                    const res = await fetch(`${clean}/api/admin/sessions`, {
+                        headers: {
+                            'x-admin-key': adminKey,
+                            'Authorization': adminKey
+                        }
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.success && Array.isArray(data.sessions)) {
+                            data.sessions.forEach(sess => {
+                                mergedSessions.push({
+                                    ...sess,
+                                    serverName: server.name,
+                                    serverUrl: clean
+                                });
+                            });
+                        }
+                    }
+                } catch (e) {}
+            }));
+
+            clusterSessionsList = mergedSessions;
+            renderSessionsTable(mergedSessions);
+
+            if (showToastMsg) {
+                showToast(`Fetched ${mergedSessions.length} active bot sessions across cluster`);
+            }
+        }
+
+        function renderSessionsTable(sessions) {
+            const tbody = document.getElementById('sessionsTableBody');
+            if (!tbody) return;
+
+            if (!sessions || sessions.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-dim); padding: 36px;">
+                            <i class="fa-solid fa-users-slash" style="font-size: 24px; margin-bottom: 8px; display: block; color: var(--text-subtle);"></i>
+                            No connected user bot sessions found on active servers. Click <strong>+ Create Session</strong> to add one.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            let html = '';
+            sessions.forEach(s => {
+                const isOnline = s.connected === true;
+                const isConnecting = s.isConnecting === true || (!isOnline && s.pairingCode);
+
+                const statusPill = isOnline
+                    ? '<span class="status-pill online"><span class="pulse-dot" style="background:#10B981;"></span> Online</span>'
+                    : (isConnecting 
+                        ? '<span class="status-pill waiting"><span class="pulse-dot" style="background:#F59E0B;"></span> Connecting / QR</span>' 
+                        : '<span class="status-pill offline"><span class="pulse-dot" style="background:#EF4444;"></span> Offline</span>');
+
+                const phone = s.phone ? (`+${s.phone.replace(/\D/g, '')}`) : '<span style="color: var(--text-subtle);">Unbound</span>';
+                const code = s.pairingCode ? `<strong style="color: #38BDF8; font-family: var(--font-mono);">${s.pairingCode}</strong>` : '<span style="color: var(--text-subtle);">--</span>';
+
+                html += `
+                    <tr>
+                        <td>
+                            <strong style="font-family: var(--font-mono); color: white;">${escapeHtml(s.sessionId)}</strong>
+                        </td>
+                        <td>${phone}</td>
+                        <td>
+                            <span style="font-size: 11px; padding: 2px 8px; border-radius: 6px; background: rgba(255, 255, 255, 0.05); color: var(--text-dim);">
+                                ${escapeHtml(s.serverName || 'Node')}
+                            </span>
+                        </td>
+                        <td>${statusPill}</td>
+                        <td>${code}</td>
+                        <td style="text-align: right;">
+                            <div style="display: flex; gap: 6px; justify-content: flex-end;">
+                                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="viewSessionQR('${s.serverUrl}', '${s.sessionId}')" title="View QR / Status">
+                                    <i class="fa-solid fa-qrcode"></i>
+                                </button>
+                                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="sessionAction('${s.serverUrl}', '${s.sessionId}', 'restart')" title="Restart Bot">
+                                    <i class="fa-solid fa-rotate"></i>
+                                </button>
+                                <button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="sessionAction('${s.serverUrl}', '${s.sessionId}', 'delete')" title="Delete Bot Session">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        // Session Actions (Restart / Delete)
+        async function sessionAction(serverUrl, sessionId, action) {
+            const adminKey = sessionStorage.getItem('kaif_admin_auth') || 'kaifadmin123';
+            if (action === 'delete' && !confirm(`Are you sure you want to permanently delete and disconnect session [${sessionId}]?`)) {
+                return;
+            }
+
+            showToast(`Processing ${action} on ${sessionId}...`);
+
+            try {
+                const res = await fetch(`${serverUrl}/api/admin/session/action`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-admin-key': adminKey,
+                        'Authorization': adminKey
+                    },
+                    body: JSON.stringify({ sessionId, action })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    showToast(`✅ Session [${sessionId}] ${action}ed successfully!`);
+                    await fetchClusterSessions();
+                } else {
+                    showToast(`Error: ${data.error || 'Action failed'}`, 'error');
+                }
+            } catch (e) {
+                showToast(`Action failed: ${e.message}`, 'error');
+            }
+        }
+
+        // View Session QR Modal
+        async function viewSessionQR(serverUrl, sessionId) {
+            document.getElementById('qrModalTitle').innerText = `Session: ${sessionId}`;
+            const body = document.getElementById('qrModalBody');
+            body.innerHTML = '<i class="fa-solid fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i><p style="color: var(--text-dim); margin-top: 10px;">Checking socket status...</p>';
+            document.getElementById('qrModal').style.display = 'flex';
+
+            try {
+                const res = await fetch(`${serverUrl}/api/status?sessionId=${encodeURIComponent(sessionId)}`);
+                const data = await res.json();
+
+                if (data.connected) {
+                    body.innerHTML = `
+                        <div style="color: var(--success); font-size: 48px; margin-bottom: 12px;"><i class="fa-solid fa-circle-check"></i></div>
+                        <h4 style="font-size: 18px; color: white;">Bot Active & Connected</h4>
+                        <p style="font-size: 13px; color: var(--text-dim); margin-top: 6px;">WhatsApp account is online and processing messages.</p>
+                    `;
+                } else if (data.qr) {
+                    body.innerHTML = `
+                        <img src="${data.qr}" alt="WhatsApp QR" style="width: 220px; height: 220px; border-radius: 12px; background: white; padding: 10px; margin-bottom: 12px;">
+                        <p style="font-size: 13px; color: var(--text-dim);">Scan using WhatsApp &gt; Linked Devices</p>
+                    `;
+                } else {
+                    body.innerHTML = `
+                        <i class="fa-solid fa-circle-notch fa-spin fa-3x" style="color: var(--warning); margin-bottom: 12px;"></i>
+                        <h4 style="font-size: 16px; color: white;">Waiting for Connection / Pairing Code</h4>
+                        <p style="font-size: 13px; color: var(--text-dim); margin-top: 6px;">Code: <strong>${data.pairingCode || 'Generating...'}</strong></p>
+                    `;
+                }
+            } catch (e) {
+                body.innerHTML = `<p style="color: var(--danger);">Failed to load status from ${serverUrl}</p>`;
+            }
+        }
+
+        // Create Session
+        function openCreateSessionModal() {
+            populateSessionFilterDropdown();
+            document.getElementById('createPhoneNumberInput').value = '';
+            document.getElementById('createSessionModal').style.display = 'flex';
+        }
+
+        async function submitCreateSession() {
+            const serverUrl = document.getElementById('createTargetServerSelect')?.value;
+            const rawPhone = document.getElementById('createPhoneNumberInput')?.value?.trim();
+            const cleanPhone = rawPhone.replace(/\D/g, '');
+
+            if (!serverUrl) {
+                showToast('Please select a target server', 'error');
+                return;
+            }
+
+            if (!cleanPhone || cleanPhone.length < 6) {
+                showToast('Please enter a valid phone number with country code', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('btnSubmitCreateSession');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Contacting Server...';
+
+            const sessionId = `user_${cleanPhone}`;
+
+            try {
+                const res = await fetch(`${cleanUrl(serverUrl)}/api/pair`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        phone: cleanPhone,
+                        phoneNumber: cleanPhone,
+                        sessionId: sessionId
+                    })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    closeModal('createSessionModal');
+                    alert(`✅ Pairing Code Generated for ${sessionId}:\n\n${data.pairingCode || data.code}\n\nLink your WhatsApp device with this code.`);
+                    await fetchClusterSessions();
+                } else {
+                    showToast(data.error || 'Failed to create session', 'error');
+                }
+            } catch (e) {
+                showToast(`Error: ${e.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-bolt"></i> Generate Pairing';
+            }
+        }
+
         // Test single server
         async function testSingleServer(id) {
             const servers = getBackendServers();
@@ -883,9 +1306,10 @@
             document.getElementById('editModal').style.display = 'flex';
         }
 
-        function closeModal() {
-            document.getElementById('editModal').style.display = 'none';
-            currentEditingId = null;
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.style.display = 'none';
+            if (modalId === 'editModal') currentEditingId = null;
         }
 
         async function saveServerModal() {
@@ -912,7 +1336,7 @@
             }
 
             saveBackendServers(servers);
-            closeModal();
+            closeModal('editModal');
             showToast(`Server Slot ${currentEditingId} saved! Testing connection...`);
 
             if (updatedServer.url) {
@@ -920,6 +1344,7 @@
                 clusterHealthData[currentEditingId] = health;
             }
 
+            populateSessionFilterDropdown();
             renderServerSlots();
             await refreshAllServers();
         }
@@ -927,6 +1352,7 @@
         function resetToDefaults() {
             if (confirm('Reset all 10 server configurations back to default settings?')) {
                 localStorage.removeItem('kaif_backend_servers_v2');
+                localStorage.removeItem('kaif_saved_servers');
                 clusterHealthData = {};
                 renderServerSlots();
                 refreshAllServers(true);
