@@ -683,6 +683,7 @@
     </div>
 
     <!-- SCRIPTS -->
+    <script src="config.js"></script>
     <script src="servers.js"></script>
     <script>
         let currentEditingId = null;
@@ -708,6 +709,9 @@
 
         // Initialize Dashboard
         async function initClusterDashboard() {
+            if (typeof loadConfigOnBoot === 'function') {
+                await loadConfigOnBoot();
+            }
             renderServerSlots();
             await refreshAllServers();
             // Auto refresh every 20 seconds

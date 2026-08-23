@@ -1,8 +1,7 @@
 /**
  * KAIF-MD MULTI-BACKEND SERVER CONFIGURATION & AUTO LOAD-BALANCER
  * 
- * You can configure up to 10 backend server URLs here.
- * Changes made in admin.html are also automatically saved in localStorage!
+ * Automatically loads URLs from config.js or config.json on every Vercel redeploy!
  */
 
 const DEFAULT_SERVERS = [
@@ -68,25 +67,36 @@ const DEFAULT_SERVERS = [
     }
 ];
 
-const STORAGE_KEY = 'kaif_backend_servers_v2';
+let runtimeServersCache = null;
 
 /**
- * Get the active list of backend servers (from localStorage or defaults)
+ * Get active list of backend servers (prioritizes config.js/config.json over stale localStorage)
  */
 function getBackendServers() {
+    if (runtimeServersCache && Array.isArray(runtimeServersCache) && runtimeServersCache.length > 0) {
+        return runtimeServersCache;
+    }
+
+    // 1. Check window.CLUSTER_CONFIG from config.js
+    if (typeof window !== 'undefined' && window.CLUSTER_CONFIG && Array.isArray(window.CLUSTER_CONFIG.servers) && window.CLUSTER_CONFIG.servers.length > 0) {
+        runtimeServersCache = window.CLUSTER_CONFIG.servers;
+        return runtimeServersCache;
+    }
+
+    // 2. Check localStorage
     try {
         if (typeof localStorage !== 'undefined') {
-            const saved = localStorage.getItem(STORAGE_KEY);
+            const saved = localStorage.getItem('kaif_backend_servers_v2') || localStorage.getItem('kaif_saved_servers');
             if (saved) {
                 const parsed = JSON.parse(saved);
                 if (Array.isArray(parsed) && parsed.length > 0) {
-                    return parsed;
+                    runtimeServersCache = parsed;
+                    return runtimeServersCache;
                 }
             }
         }
-    } catch (e) {
-        console.error('Error loading servers from storage:', e);
-    }
+    } catch (e) {}
+
     return DEFAULT_SERVERS;
 }
 
@@ -94,13 +104,39 @@ function getBackendServers() {
  * Save backend servers list to localStorage
  */
 function saveBackendServers(servers) {
+    runtimeServersCache = servers;
     try {
         if (typeof localStorage !== 'undefined') {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(servers));
+            localStorage.setItem('kaif_backend_servers_v2', JSON.stringify(servers));
+            localStorage.setItem('kaif_saved_servers', JSON.stringify(servers));
         }
     } catch (e) {
         console.error('Error saving servers to storage:', e);
     }
+}
+
+/**
+ * Fetch and load latest config.json/config.js on startup with cache busting
+ */
+async function loadConfigOnBoot() {
+    try {
+        // 1. Check config.js
+        if (typeof window !== 'undefined' && window.CLUSTER_CONFIG && Array.isArray(window.CLUSTER_CONFIG.servers)) {
+            runtimeServersCache = window.CLUSTER_CONFIG.servers;
+            return runtimeServersCache;
+        }
+
+        // 2. Fetch config.json
+        const res = await fetch('./config.json?t=' + Date.now(), { cache: 'no-store' });
+        if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data.servers) && data.servers.length > 0) {
+                runtimeServersCache = data.servers;
+                return runtimeServersCache;
+            }
+        }
+    } catch (e) {}
+    return getBackendServers();
 }
 
 /**
@@ -192,22 +228,8 @@ async function checkServerHealth(serverUrl, timeoutMs = 6000) {
  * Scan all configured backend servers and find the best available server with free capacity
  */
 async function findBestAvailableServer() {
-    let servers = getBackendServers().filter(s => s.enabled && s.url && s.url.trim() !== '');
-    
-    // Also try to load from config.json if not cached
-    try {
-        const cfgRes = await fetch('./config.json?t=' + Date.now());
-        if (cfgRes.ok) {
-            const cfgData = await cfgRes.json();
-            if (Array.isArray(cfgData.servers) && cfgData.servers.length > 0) {
-                const stored = getBackendServers();
-                if (!localStorage.getItem(STORAGE_KEY)) {
-                    servers = cfgData.servers.filter(s => s.enabled && s.url && s.url.trim() !== '');
-                    saveBackendServers(cfgData.servers);
-                }
-            }
-        }
-    } catch (e) {}
+    await loadConfigOnBoot();
+    const servers = getBackendServers().filter(s => s.enabled && s.url && s.url.trim() !== '');
 
     if (servers.length === 0) {
         const fallbackUrl = (typeof window !== 'undefined' && window.location.origin) ? window.location.origin : 'https://backend-01-24b5dad12790.herokuapp.com';
@@ -251,7 +273,7 @@ async function findBestAvailableServer() {
     return available[0];
 }
 
-// Export for browser global or module environments
+// Auto-run on load
 if (typeof window !== 'undefined') {
     window.DEFAULT_SERVERS = DEFAULT_SERVERS;
     window.getBackendServers = getBackendServers;
@@ -259,4 +281,5 @@ if (typeof window !== 'undefined') {
     window.checkServerHealth = checkServerHealth;
     window.findBestAvailableServer = findBestAvailableServer;
     window.cleanUrl = cleanUrl;
+    window.loadConfigOnBoot = loadConfigOnBoot;
 }
