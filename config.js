@@ -24,7 +24,7 @@ window.CLUSTER_CONFIG = {
         {
             id: 3,
             name: "Backend Server 03",
-            url: "",
+            url: "https://web-production-9f9ad.up.railway.app",
             enabled: true
         },
         {
