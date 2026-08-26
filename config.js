@@ -24,13 +24,13 @@ window.CLUSTER_CONFIG = {
         {
             id: 3,
             name: "Backend Server 03",
-            url: "https://web-production-9f9ad.up.railway.app",
+            url: "https://backend03-8134a68d23db.herokuapp.com",
             enabled: true
         },
         {
             id: 4,
             name: "Backend Server 04",
-            url: "",
+            url: "https://backend-04-e5305375f038.herokuapp.com",
             enabled: true
         },
         {
