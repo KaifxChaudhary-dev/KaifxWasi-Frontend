@@ -12,7 +12,7 @@ window.CLUSTER_CONFIG = {
         {
             id: 1,
             name: "Backend Server 01 (Primary)",
-            url: "https://backend-02-ce708230c56b.herokuapp.com",
+            url: "https://backend-old-e9dcbc877391.herokuapp.com/",
             enabled: true
         },
         {
