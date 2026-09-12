@@ -36,7 +36,7 @@ window.CLUSTER_CONFIG = {
         {
             id: 5,
             name: "Backend Server 05",
-            url: "",
+            url: "https://testing-server-8a33dfe6553c.herokuapp.com",
             enabled: true
         },
         {
