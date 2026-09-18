@@ -12,37 +12,37 @@ window.CLUSTER_CONFIG = {
         {
             id: 1,
             name: "Backend Server 01 (Primary)",
-            url: "https://backend-old-264d9add47a5.herokuapp.com",
+            url: "https://backend-01-8e2af1923096.herokuapp.com",
             enabled: true
         },
         {
             id: 2,
             name: "Backend Server 02",
-            url: "https://backend01-d5936b5321d2.herokuapp.com",
+            url: "https://backend-02-8ccd7952e737.herokuapp.com",
             enabled: true
         },
         {
             id: 3,
             name: "Backend Server 03",
-            url: "https://backend03-8134a68d23db.herokuapp.com",
+            url: "https://backend-03-f0f0139e6d47.herokuapp.com",
             enabled: true
         },
         {
             id: 4,
             name: "Backend Server 04",
-            url: "https://backend-04-e5305375f038.herokuapp.com",
+            url: "https://backend-4-642dd6477ab0.herokuapp.com",
             enabled: true
         },
         {
             id: 5,
             name: "Backend Server 05",
-            url: "https://testing-server-8a33dfe6553c.herokuapp.com",
+            url: "https://backend-05-6bdc2241a0a6.herokuapp.com",
             enabled: true
         },
         {
             id: 6,
             name: "Backend Server 06",
-            url: "",
+            url: "https://backend-06-85b898dc7fec.herokuapp.com",
             enabled: true
         },
         {
