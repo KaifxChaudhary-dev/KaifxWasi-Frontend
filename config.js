@@ -48,7 +48,7 @@ window.CLUSTER_CONFIG = {
         {
             id: 7,
             name: "Backend Server 07",
-            url: "https://special-mini-bot-ff4a6ed847ff.herokuapp.com",
+            url: "",
             enabled: true
         },
         {
